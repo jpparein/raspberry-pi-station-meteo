@@ -2,7 +2,7 @@
 
 Une station météo locale construite autour d’un ancien **Raspberry Pi 2B**, d’un capteur **DHT22 / AM2302** et d’un **iPad Air sous iOS 12.5.7** réutilisé comme écran permanent.
 
-L’objectif était simple : transformer du matériel qui dormait dans les tiroirs — Raspberry Pi, clé Wi-Fi, câble téléphonique, boîtier et tablette — en un objet réellement utile.
+L’objectif était simple : transformer du matériel qui dormait dans mes tiroirs : Raspberry Pi, clé Wi-Fi, câble téléphonique RJ11, boîtier et Vieille IPad en un objet réellement utile.
 
 ![Station météo affichée sur un ancien iPad](docs/images/12-affichage-station-meteo-ipad.png)
 
@@ -109,7 +109,7 @@ Ici, il est installé sous un avant-toit. Cette solution reste artisanale : pour
 
 ![Installation extérieure du capteur](docs/images/11-installation-capteur-exterieur.png)
 
-Le Raspberry Pi reste à l’intérieur, près du point d’accès Wi-Fi.
+Le Raspberry Pi reste à l’intérieur de la dépendance , près du point d’accès Wi-Fi, sur ses jolies briques qui servent de support.
 
 ![Raspberry Pi et clé Wi-Fi près du routeur](docs/images/10-installation-raspberry-et-wifi.png)
 
@@ -310,9 +310,9 @@ Au premier lancement, saisissez une commune ou un code postal. La recherche Open
 
 Ce fichier n’est pas inclus dans le dépôt GitHub.
 
-## Utilisation sur l’ancien iPad
+## Utilisation sur l’ancien iPad ou une tablette Android
 
-1. Ouvrez l’adresse de la station dans Safari.
+1. Ouvrez l’adresse de la station dans Safari (IPad).
 2. Utilisez le menu de partage.
 3. Choisissez **Sur l’écran d’accueil**.
 4. Lancez ensuite l’icône créée.
@@ -493,7 +493,7 @@ Cette application est prévue pour un réseau local de confiance.
 
 ## Crédits
 
-Projet réalisé par **Jean-Philippe Parein – PSI Informatique**.
+Projet réalisé par **Jean-Philippe Parein **.
 
 - Prévisions et géocodage : [Open-Meteo](https://open-meteo.com/)
 - Pilote du capteur : [Adafruit CircuitPython DHT](https://github.com/adafruit/Adafruit_CircuitPython_DHT)

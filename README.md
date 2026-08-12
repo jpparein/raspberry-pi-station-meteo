@@ -1,8 +1,10 @@
-# Station météo Raspberry Pi avec du matériel de récupération
+# Station météo Raspberry Pi : opération vide-tiroirs !
 
-Une station météo locale construite autour d’un ancien **Raspberry Pi 2B**, d’un capteur **DHT22 / AM2302** et d’un **iPad Air sous iOS 12.5.7** réutilisé comme écran permanent.
+Tout est parti d’un constat très scientifique : chez moi, j’avais un **Raspberry Pi 2B**, une vieille **clé Wi-Fi**, un **iPad Air sous iOS 12.5.7**, un ancien câble téléphonique RJ11 et quelques composants qui dormaient tranquillement dans mes tiroirs.
 
-L’objectif était simple : transformer du matériel qui dormait dans mes tiroirs : Raspberry Pi, clé Wi-Fi, câble téléphonique RJ11, boîtier et Vieille IPad en un objet réellement utile.
+Je n’ai pas acheté un lot de vieux matériel spécialement pour prétendre faire de la récupération : ce sont réellement des choses que je possédais déjà chez moi et qui ne servaient plus. Plutôt que de les laisser poursuivre leur carrière de ramasse-poussière, j’ai décidé d’en faire une station météo locale avec un capteur **DHT22 / AM2302**. Elle mesure la température et l’humidité, conserve un historique, affiche les prévisions et transforme l’ancien iPad en écran permanent.
+
+Le résultat n’a évidemment pas vocation à concurrencer Météo-France, mais il est plutôt complet pour un projet fabriqué essentiellement avec ce que j’avais déjà sous la main.
 
 ![Station météo affichée sur un ancien iPad](docs/images/12-affichage-station-meteo-ipad.png)
 
@@ -10,7 +12,7 @@ L’objectif était simple : transformer du matériel qui dormait dans mes tiroi
 
 ![Démonstration animée de l’interface](docs/images/11-demonstration-interface-web.gif)
 
-## Fonctionnalités
+## Ce qu’elle sait faire
 
 - mesure locale de la température et de l’humidité avec un DHT22 ;
 - collecte automatique environ toutes les 5 minutes ;
@@ -27,7 +29,15 @@ L’objectif était simple : transformer du matériel qui dormait dans mes tiroi
 - interface tactile compatible avec Safari sous iOS 12.5.7 ;
 - aucun compte en ligne et aucune clé API nécessaires.
 
-> Les mesures et l’historique sont hébergés localement. Les prévisions et les horaires solaires nécessitent toutefois une connexion Internet vers Open-Meteo.
+> Les mesures et l’historique restent à la maison, sur le Raspberry Pi. Seules les prévisions et les heures de lever/coucher du soleil nécessitent Internet via Open-Meteo.
+
+## Pourquoi ces choix parfois très raisonnables… et parfois beaucoup moins
+
+Le Raspberry Pi possède bien une prise Ethernet, parfaitement visible sur les photos. J’aurais donc pu tirer un câble RJ45 : le routeur est juste à côté. Mais le prototype avait déjà été configuré en Wi-Fi, avec son adresse réservée dans la box, et je n’avais franchement pas envie de tout refaire.
+
+En plus, une ancienne clé Wi-Fi TP-Link attendait justement son heure de gloire dans un tiroir. Elle est vieille, limitée au Wi-Fi 802.11n et ne gagnera aucun concours de vitesse, mais pour envoyer quelques mesures et servir une page web locale, elle est très largement suffisante. Autant qu’elle serve à quelque chose !
+
+Même logique pour le reste : le Raspberry Pi 2B n’est plus tout jeune, l’iPad est bloqué sur iOS 12.5.7 et l’ancien câble téléphonique RJ11 ne servait plus à rien. Il possède quatre fils, le capteur n’en demande que trois : alimentation, données et masse. Il fait donc parfaitement l’affaire, et le quatrième fil peut continuer à ne rien faire, mais cette fois à l’extérieur.
 
 ## Matériel utilisé
 
@@ -36,8 +46,8 @@ L’objectif était simple : transformer du matériel qui dormait dans mes tiroi
 | Raspberry Pi 2 Model B | Serveur, acquisition et stockage |
 | Carte microSD 32 Go | Système et base SQLite |
 | DHT22 / AM2302 sur module | Température et humidité |
-| Ancien câble téléphonique d’environ 5 m | Déport du capteur extérieur |
-| Clé Wi-Fi USB TP-Link | Connexion réseau du Raspberry Pi 2B |
+| Ancien câble téléphonique RJ11 d’environ 5 m | Déport du capteur avec 3 de ses 4 fils |
+| Vieille clé Wi-Fi USB TP-Link | Connexion réseau : pas rapide, mais largement suffisante |
 | Boîtier transparent | Protection du Raspberry Pi |
 | Ancien iPad Air, iOS 12.5.7 | Écran tactile de la station |
 | Gaine thermorétractable et fils | Isolation des raccordements |
@@ -56,11 +66,11 @@ flowchart TD
     F --> G["PC, mobile ou ancien iPad"]
 ```
 
-Le service `meteo.service` exécute `collect.py` en permanence. Le script lit le capteur sur le GPIO 4, puis ajoute une mesure à SQLite environ toutes les cinq minutes. Apache et PHP exposent les données sous forme de JSON à l’interface web.
+Le principe reste assez simple : le service `meteo.service` garde `collect.py` éveillé pendant que nous dormons. Le script lit le capteur sur le GPIO 4, puis ajoute une mesure à SQLite environ toutes les cinq minutes. Apache et PHP transforment ensuite ces données en JSON pour l’interface web.
 
-Le bouton **Mesurer** utilise `live_read.py`. Cette lecture met immédiatement l’écran à jour, mais elle n’est volontairement pas enregistrée : les statistiques restent basées uniquement sur les mesures automatiques.
+Le bouton **Mesurer** utilise `live_read.py`. Il permet de satisfaire immédiatement le classique « oui, mais combien fait-il maintenant ? ». Cette lecture actualise l’écran sans être enregistrée : les statistiques restent basées uniquement sur les mesures automatiques.
 
-## Branchement du DHT22
+## Branchement du DHT22 — trois fils, pas un de plus
 
 Le module utilisé possède trois broches : `+`, `OUT` et `−`.
 
@@ -76,17 +86,17 @@ Le module DHT22 visible sur les photos intègre déjà son électronique de supp
 
 ### Préparation du câble récupéré
 
-L’ancien câble téléphonique permet d’éloigner le capteur du Raspberry Pi. Trois conducteurs suffisent : alimentation, données et masse.
+J’avais chez moi un ancien câble téléphonique RJ11 d’environ cinq mètres qui ne servait plus. Pour relier le capteur, inutile d’acheter un câble neuf : celui-ci possède quatre conducteurs et le DHT22 n’en demande que trois — alimentation, données et masse. Il fait parfaitement l’affaire. Le quatrième fil reste inutilisé et profite simplement de la promenade jusqu’au capteur.
 
 ![Préparation du câble](docs/images/03-preparation-cable-capteur.jpg)
 
-Les raccords sont soudés, puis chaque conducteur est isolé avec de la gaine thermorétractable.
+Les raccords sont soudés, puis chaque conducteur est isolé avec de la gaine thermorétractable. Les soudures ne gagneront peut-être pas le premier prix d’un concours d’électronique, mais elles tiennent, elles conduisent le courant et elles sont correctement isolées : contrat rempli. Ce n’est pas la partie la plus spectaculaire du projet, mais c’est celle qui évite que tout s’arrête au premier faux contact.
 
 ![Soudure des fils du DHT22](docs/images/04-soudure-fils-dht22.jpg)
 
 ![Capteur et câble terminés](docs/images/05-capteur-cable-termine.jpg)
 
-Le repérage `+`, `OUT` et `−` évite toute inversion lors du branchement final.
+Le repérage `+`, `OUT` et `−` évite de jouer à la loterie au moment du branchement final.
 
 ![Raccordement final du DHT22](docs/images/09-raccordement-final-dht22.jpg)
 
@@ -105,11 +115,11 @@ Le capteur doit être placé :
 - dans un endroit ventilé ;
 - loin d’un mur, d’une toiture ou d’un appareil qui accumule de la chaleur.
 
-Ici, il est installé sous un avant-toit. Cette solution reste artisanale : pour obtenir des mesures météorologiques de référence, utilisez un véritable abri à coupelles ou un abri Stevenson.
+Ici, il est installé sous un avant-toit. La fixation fait appel à une technologie de pointe disponible dans presque tous les tiroirs : un crochet et du ruban adhésif. Ce n’est pas très académique, mais le capteur est maintenu, protégé de la pluie et du soleil direct, tout en restant ventilé. Cette solution reste artisanale : pour obtenir des mesures météorologiques de référence, utilisez un véritable abri à coupelles ou un abri Stevenson. Mon montage mesure la météo ; il ne dépose pas encore de bulletin officiel à 20 heures.
 
 ![Installation extérieure du capteur](docs/images/11-installation-capteur-exterieur.png)
 
-Le Raspberry Pi reste à l’intérieur de la dépendance , près du point d’accès Wi-Fi, sur ses jolies briques qui servent de support.
+Le Raspberry Pi reste à l’intérieur de la dépendance du jardin, près du routeur, posé sur une brique — un support sans ventilateur, sans vis et garanti totalement compatible avec le Raspberry Pi 2B. Le port Ethernet était disponible, mais la clé Wi-Fi était déjà configurée, l’adresse réservée dans la box et ma motivation pour refaire le réseau proche de zéro. Pour quelques requêtes météo, cette vieille clé suffit largement.
 
 ![Raspberry Pi et clé Wi-Fi près du routeur](docs/images/10-installation-raspberry-et-wifi.png)
 
@@ -142,6 +152,8 @@ Le Raspberry Pi reste à l’intérieur de la dépendance , près du point d’a
 
 ## Installation depuis zéro
 
+Passons maintenant de « j’ai trouvé du matériel dans un tiroir » à « ça fonctionne vraiment ». Les commandes suivantes sont volontairement complètes et directement copiables.
+
 Les commandes ci-dessous supposent :
 
 - Raspberry Pi OS Bookworm ;
@@ -158,14 +170,14 @@ Installez Raspberry Pi OS, activez SSH et configurez le réseau. Connectez-vous 
 ssh rpi@ADRESSE_IP_DU_PI
 ```
 
-Mettez le système à jour :
+Commencez par mettre le système à jour. C’est moins amusant que de souder, mais beaucoup plus pratique que de chercher ensuite pourquoi un paquet refuse de s’installer :
 
 ```bash
 sudo apt update
 sudo apt full-upgrade -y
 ```
 
-### 2. Installer les paquets
+### 2. Installer les paquets nécessaires
 
 ```bash
 sudo apt install -y apache2 php libapache2-mod-php php-sqlite3 sqlite3 python3-venv python3-pip libgpiod2
@@ -189,6 +201,8 @@ Ou copiez manuellement le dossier du projet dans :
 ```
 
 ### 4. Créer l’environnement Python
+
+On isole les bibliothèques du capteur dans un environnement virtuel. Le Raspberry Pi appréciera qu’on ne transforme pas son Python système en vide-grenier numérique.
 
 ```bash
 python3 -m venv /home/rpi/meteo-env
@@ -274,7 +288,7 @@ Contrôlez son état :
 sudo systemctl status meteo.service --no-pager
 ```
 
-### 9. Tester le capteur
+### 9. Tester le capteur — le moment de vérité
 
 Lecture instantanée :
 
@@ -282,7 +296,7 @@ Lecture instantanée :
 /home/rpi/meteo-env/bin/python3 /home/rpi/meteo/live_read.py
 ```
 
-Résultat attendu :
+Si tout est correctement branché, vous devriez obtenir quelque chose de ce genre :
 
 ```text
 OK:23.4:48.7
@@ -302,7 +316,7 @@ Depuis un appareil connecté au même réseau :
 http://ADRESSE_IP_DU_PI/meteo/
 ```
 
-Au premier lancement, saisissez une commune ou un code postal. La recherche Open-Meteo fournit automatiquement les coordonnées et le fuseau horaire. La commune choisie est enregistrée localement dans :
+Au premier lancement, l’application demande une commune ou un code postal. Inutile de modifier le PHP à la main ou de publier vos coordonnées sur GitHub : Open-Meteo recherche automatiquement la position et le fuseau horaire. La commune choisie est enregistrée localement dans :
 
 ```text
 /home/rpi/meteo/data/location.json
@@ -310,14 +324,14 @@ Au premier lancement, saisissez une commune ou un code postal. La recherche Open
 
 Ce fichier n’est pas inclus dans le dépôt GitHub.
 
-## Utilisation sur l’ancien iPad ou une tablette Android
+## Donner une seconde vie à l’ancien iPad
 
-1. Ouvrez l’adresse de la station dans Safari (IPad).
+1. Ouvrez l’adresse de la station dans Safari sur l’iPad.
 2. Utilisez le menu de partage.
 3. Choisissez **Sur l’écran d’accueil**.
 4. Lancez ensuite l’icône créée.
 
-Les métadonnées `apple-mobile-web-app-capable`, le viewport mobile, `XMLHttpRequest` et les préfixes `-webkit-` assurent la compatibilité avec iOS 12.5.7.
+L’iPad est ancien, Safari aussi, et tous deux ont parfois des opinions très arrêtées sur le JavaScript moderne. L’interface utilise donc `XMLHttpRequest`, des préfixes `-webkit-` et une syntaxe compatible avec iOS 12.5.7.
 
 Selon la version exacte de Safari, certaines limites du système peuvent subsister, notamment pour maintenir l’écran allumé en permanence.
 
@@ -349,7 +363,7 @@ Le point de rosée est calculé avec une approximation de Magnus. Cette informat
 
 ### Mode nuit
 
-Le mode nuit utilise les heures de lever et de coucher du soleil fournies par Open-Meteo pour la commune choisie. En l’absence de ces données, un horaire de repli entre 21 h et 7 h est utilisé. Le bouton en haut à droite permet aussi de basculer manuellement.
+Le mode nuit utilise les heures de lever et de coucher du soleil fournies par Open-Meteo pour la commune choisie. En l’absence de ces données, un horaire de repli entre 21 h et 7 h est utilisé. Un bouton permet aussi de basculer manuellement, parce que même le soleil n’a pas toujours le dernier mot.
 
 ### Température CPU
 
@@ -398,7 +412,7 @@ curl -s "http://localhost/meteo/api.php?action=cpu_temp"
 curl -s "http://localhost/meteo/api.php?action=location_search&q=Lille"
 ```
 
-## Dépannage
+## Dépannage — quand la météo refuse de coopérer
 
 ### Aucune mesure ne s’affiche
 
@@ -408,7 +422,7 @@ sudo journalctl -u meteo.service -n 50 --no-pager
 /home/rpi/meteo-env/bin/python3 /home/rpi/meteo/live_read.py
 ```
 
-Vérifiez ensuite le 3,3 V, la masse et la connexion du GPIO 4.
+Vérifiez ensuite le 3,3 V, la masse et la connexion du GPIO 4. Dans la majorité des cas, le logiciel n’est pas vexé : c’est simplement un fil qui l’est.
 
 ### Vérifier les dernières mesures
 
@@ -473,7 +487,7 @@ Cette application est prévue pour un réseau local de confiance.
 - Ne publiez jamais `meteo.db`, `location.json`, `forecast_cache.json`, des sauvegardes ou des journaux.
 - `location_save` et `location_reset` exigent une requête POST pour éviter une modification par simple URL.
 
-## Limites connues
+## Limites connues — restons honnêtes
 
 - Le DHT22 ne constitue pas une station météorologique étalonnée.
 - La proximité d’un mur ou d’une toiture chauffée peut augmenter la température mesurée.
@@ -481,7 +495,7 @@ Cette application est prévue pour un réseau local de confiance.
 - Les prévisions et le mode solaire nécessitent Open-Meteo et une connexion Internet ; un cache permet de conserver les dernières prévisions connues.
 - Après un changement de commune, rechargez la page si les anciennes prévisions restent visibles jusqu’au rafraîchissement suivant.
 
-## Améliorations possibles
+## Et après ?
 
 - remplacer le DHT22 par un BME280 pour ajouter la pression ;
 - utiliser un abri météo normalisé ;
@@ -493,7 +507,7 @@ Cette application est prévue pour un réseau local de confiance.
 
 ## Crédits
 
-Projet réalisé par **Jean-Philippe Parein **.
+Projet réalisé par **Jean-Philippe Parein** avec beaucoup de matériel récupéré, quelques soudures et une quantité raisonnable de « tant qu’à faire… ».
 
 - Prévisions et géocodage : [Open-Meteo](https://open-meteo.com/)
 - Pilote du capteur : [Adafruit CircuitPython DHT](https://github.com/adafruit/Adafruit_CircuitPython_DHT)

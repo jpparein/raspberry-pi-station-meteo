@@ -1,0 +1,20 @@
+# Donnees locales et privees
+meteo.db
+*.db
+location.json
+forecast_cache.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Sauvegardes
+*.bak
+backups/
+
+# Configuration locale et fichiers systeme
+.env
+.DS_Store
+Thumbs.db
+

@@ -10,7 +10,7 @@ Le résultat n’a évidemment pas vocation à concurrencer Météo-France, mais
 
 ## Démonstration
 
-![Démonstration animée de l’interface](docs/images/11-demonstration-interface-web.gif)
+![Démonstration animée de l’interface](docs/images/21-demonstration-interface-web.gif)
 
 ## Ce qu’elle sait faire
 

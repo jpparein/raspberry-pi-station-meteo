@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Meteo">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Station Meteo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:Helvetica,Arial,sans-serif;color:#fff;overflow:hidden;background:#333}
+#bg{position:fixed;top:0;left:0;right:0;bottom:0;z-index:0;-webkit-transition:background 1.5s;transition:background 1.5s}
+.bg-hot{background:linear-gradient(180deg,#ff6f00 0%,#d84315 60%,#b71c1c 100%)}
+.bg-warm{background:linear-gradient(180deg,#ffa726 0%,#f57c00 60%,#e65100 100%)}
+.bg-mild{background:linear-gradient(180deg,#66bb6a 0%,#43a047 60%,#2e7d32 100%)}
+.bg-cool{background:linear-gradient(180deg,#42a5f5 0%,#1e88e5 60%,#1565c0 100%)}
+.bg-cold{background:linear-gradient(180deg,#90a4ae 0%,#607d8b 60%,#455a64 100%)}
+.bg-cloudy{background:linear-gradient(180deg,#78909c 0%,#546e7a 60%,#37474f 100%)}
+.bg-rain{background:linear-gradient(180deg,#455a64 0%,#37474f 60%,#263238 100%)}
+#fx{position:fixed;top:0;left:0;right:0;bottom:0;z-index:1;pointer-events:none;overflow:hidden}
+#part{position:absolute;top:0;left:0;right:0;bottom:0}
+.pt{position:absolute;bottom:-10px;border-radius:50%;opacity:0;-webkit-animation:rise linear infinite;animation:rise linear infinite}
+@-webkit-keyframes rise{from{-webkit-transform:translateY(0)}to{-webkit-transform:translateY(-110vh)}}
+@keyframes rise{from{transform:translateY(0)}to{transform:translateY(-110vh)}}
+@-webkit-keyframes twinkle{0%,100%{opacity:.08;-webkit-transform:scale(.8)}50%{opacity:.45;-webkit-transform:scale(1.2)}}
+@keyframes twinkle{0%,100%{opacity:.08;transform:scale(.8)}50%{opacity:.45;transform:scale(1.2)}}
+#cldW{position:absolute;top:0;left:0;right:0;bottom:0;opacity:0;-webkit-transition:opacity 1s;transition:opacity 1s}
+#cldW.on{opacity:1}
+.cld{position:absolute;background:rgba(255,255,255,.18);border-radius:40px}
+.c1{width:140px;height:40px;top:12%;-webkit-animation:dr 20s linear infinite;animation:dr 20s linear infinite}
+.c2{width:100px;height:30px;top:25%;-webkit-animation:dr 28s linear infinite;animation:dr 28s linear infinite;opacity:.6}
+.c3{width:160px;height:36px;top:6%;-webkit-animation:dr 32s linear infinite;animation:dr 32s linear infinite;opacity:.35}
+@-webkit-keyframes dr{from{left:-170px}to{left:110%}}
+@keyframes dr{from{left:-170px}to{left:110%}}
+#rainW{position:absolute;top:0;left:0;right:0;bottom:0;opacity:0;-webkit-transition:opacity .8s;transition:opacity .8s}
+#rainW.on{opacity:1}
+.drop{position:absolute;width:2px;top:-20px;background:rgba(174,194,224,.6);border-radius:0 0 2px 2px;-webkit-animation:rf linear infinite;animation:rf linear infinite}
+@-webkit-keyframes rf{from{-webkit-transform:translateY(0)}to{-webkit-transform:translateY(100vh)}}
+@keyframes rf{from{transform:translateY(0)}to{transform:translateY(100vh)}}
+#snowW{position:absolute;top:0;left:0;right:0;bottom:0;opacity:0;-webkit-transition:opacity .8s;transition:opacity .8s}
+#snowW.on{opacity:1}
+.fl{position:absolute;top:-8px;border-radius:50%;background:rgba(255,255,255,.8);-webkit-animation:sf linear infinite;animation:sf linear infinite}
+@-webkit-keyframes sf{from{-webkit-transform:translateY(0)}to{-webkit-transform:translateY(100vh)}}
+@keyframes sf{from{transform:translateY(0)}to{transform:translateY(100vh)}}
+#litW{position:absolute;top:0;left:0;right:0;bottom:0;opacity:0;-webkit-transition:opacity .08s;transition:opacity .08s}
+#litW.on{opacity:1;background:rgba(255,255,255,.2)}
+#ui{position:relative;z-index:2;height:100%;display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;-webkit-flex-direction:column;flex-direction:column;-webkit-box-align:center;-webkit-align-items:center;align-items:center;-webkit-box-pack:center;-webkit-justify-content:center;justify-content:center;padding:110px 10px 150px}
+.hdr{position:absolute;top:0;left:0;right:0;display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-align:center;-webkit-align-items:center;align-items:center;-webkit-box-pack:justify;-webkit-justify-content:space-between;justify-content:space-between;padding:10px 14px;z-index:3}
+.nav{color:#fff;text-decoration:none;font-size:14px;padding:6px 12px;border-radius:12px;background:rgba(255,255,255,.2)}
+.dt{position:absolute;left:50%;top:4px;-webkit-transform:translateX(-50%);transform:translateX(-50%);text-align:center;pointer-events:none}
+.dt-day{font-size:14px;letter-spacing:3px;text-transform:uppercase;opacity:.6}
+.dt-time{font-size:34px;font-weight:300;line-height:1.05;text-shadow:0 1px 6px rgba(0,0,0,.15)}
+.dt-date{font-size:14px;opacity:.6}
+.dt-saint{font-size:14px;opacity:.8;margin-top:2px;font-style:italic}
+.pill{display:-webkit-inline-box;display:-webkit-inline-flex;display:inline-flex;-webkit-box-align:center;-webkit-align-items:center;align-items:center;padding:4px 10px;border-radius:14px;background:rgba(255,255,255,.2);font-size:12px}
+.dot{width:6px;height:6px;border-radius:50%;background:#e74c3c;margin-right:7px}
+.dot.ok{background:#2ecc71}
+.hero{text-align:center}
+.lbl{font-size:14px;opacity:.7;letter-spacing:1px;text-transform:uppercase}
+.val{font-size:7rem;font-weight:100;line-height:.9;text-shadow:0 3px 15px rgba(0,0,0,.1);margin:2px 0}
+.u{font-size:2.2rem;vertical-align:top;opacity:.8}
+.sub{font-size:12px;opacity:.5;margin-top:4px}
+.hum{margin:6px 0;padding:5px 14px;border-radius:14px;background:rgba(255,255,255,.2);font-size:13px;opacity:.8}
+.btn{margin:4px 0;padding:11px 24px;border:none;border-radius:12px;font-size:14px;font-weight:600;color:#fff;background:rgba(255,255,255,.22);cursor:pointer}
+.btn.ld{opacity:.5}
+.fc{position:absolute;bottom:20px;left:0;right:0;z-index:3}
+.fs{display:-webkit-box;display:-webkit-flex;display:flex;overflow-x:auto;padding:6px 8px;-webkit-overflow-scrolling:touch}
+.fs::-webkit-scrollbar{display:none}
+.fi{-webkit-flex:0 0 auto;flex:0 0 auto;width:64px;text-align:center;padding:10px 4px;border-radius:14px;background:rgba(255,255,255,.15);margin-right:6px}
+.fi.now{background:rgba(255,255,255,.3)}
+.fh{font-size:13px;opacity:.6;margin-bottom:4px}
+.ft2{font-size:16px;font-weight:600}
+.src{position:absolute;bottom:3px;left:0;right:0;text-align:center;font-size:10px;opacity:.4;padding:2px 0}
+.ftr{display:none}
+@media(min-width:768px){.val{font-size:11rem}}
+.ico{width:28px;height:28px;margin:0 auto 4px;position:relative}
+.ico-sun{background:radial-gradient(circle,#fff9c4,#ffb300);border-radius:50%;box-shadow:0 0 6px #ffb300}
+.ico-part{background:radial-gradient(circle,#fff9c4,#ffb300);border-radius:50%;box-shadow:0 0 4px #ffb300;position:absolute;top:2px;left:1px;width:14px;height:14px}
+.ico-part::after{content:'';position:absolute;bottom:-2px;right:-6px;width:16px;height:10px;background:rgba(200,210,220,.85);border-radius:8px}
+.ico-cloud{background:rgba(200,210,220,.85);border-radius:10px;width:18px;height:10px;margin-top:5px}
+.ico-rain{background:rgba(140,170,200,.8);border-radius:8px;width:16px;height:8px;margin-top:4px}
+.ico-rain::after{content:'';position:absolute;bottom:-6px;left:3px;width:2px;height:4px;background:rgba(140,170,200,.7);border-radius:1px;box-shadow:5px 0 0 rgba(140,170,200,.7)}
+.ico-snow{background:rgba(200,210,220,.7);border-radius:8px;width:16px;height:8px;margin-top:4px}
+.ico-storm{background:rgba(80,90,100,.8);border-radius:8px;width:16px;height:8px;margin-top:4px}
+.ico-storm::after{content:'!';position:absolute;bottom:-8px;left:6px;font-size:8px;color:#ff0;font-weight:700}
+
+/* === MODE NUIT === */
+body.night #bg{-webkit-transition:background 1.5s;transition:background 1.5s}
+body.night #bg{background:#000!important}
+body.night #sunW.on{opacity:.16}
+body.night .sunG{animation:none;opacity:0}
+body.night .sunC{box-shadow:0 0 24px 6px rgba(255,183,0,.1)}
+body.night .ico-sun{background:radial-gradient(circle,#cdd4db,#9aa2ab);box-shadow:0 0 4px rgba(150,160,170,.35)}
+body.night .ico-part{background:radial-gradient(circle,#cdd4db,#9aa2ab);box-shadow:0 0 3px rgba(150,160,170,.3)}
+body.night .ico-cloud{background:rgba(150,160,172,.55)}
+body.night .ico-rain{background:rgba(120,140,165,.6)}
+body.night .ico-snow{background:rgba(170,180,190,.5)}
+body.night .ico-storm{background:rgba(60,70,82,.7)}
+body.night .ico-storm::after{color:#cdd4db}
+body.night .lbl{color:#9aa7b4}
+body.night .val{color:#eef2f6;text-shadow:0 2px 10px rgba(0,0,0,.45)}
+body.night .u{color:#cdd6df}
+body.night .sub{color:#7c8a99}
+body.night .hum{background:rgba(20,30,50,.5);color:#5a7a8a}
+body.night .btn{background:rgba(20,30,50,.5)!important;color:#6a8a9a!important}
+body.night .pill{background:rgba(20,30,50,.5);color:#5a7a8a}
+body.night .dot{background:#3a5a6a!important}
+body.night .dot.ok{background:#4a6a5a!important}
+body.night .nav{background:rgba(20,30,50,.5);color:#5a7a8a}
+body.night .dt-day,body.night .dt-date,body.night .dt-saint{color:#4a5a6a}
+body.night .dt-time{color:#6a8a9a}
+body.night .fi{background:rgba(20,30,50,.4)}
+body.night .fi.now{background:rgba(20,30,50,.6)}
+body.night .fh{color:#8a97a6}
+body.night .ft2{color:#b3c2d1}
+body.night .src{color:#3a4a5a}
+body.night .cld{background:rgba(30,40,60,.15)}
+body.night .drop{background:rgba(80,100,130,.4)}
+body.night .fl{background:rgba(150,170,200,.6)}
+
+/* Toggle nuit */
+.night-toggle{position:absolute;right:14px;top:54px;z-index:5;width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,.15);color:#fff;font-size:20px;cursor:pointer;line-height:44px;text-align:center}
+body.night .night-toggle{background:rgba(100,120,150,.3);color:#8aa0b0}
+.nsched{font-size:.8rem;opacity:.62;margin:2px 0 6px;text-align:center;min-height:1rem;margin-top:auto}
+body.night .nsched{color:#9aa7b4}
+.hdew{font-size:.72rem;opacity:.55;margin-top:5px;text-align:center}
+.hlim{font-size:.62rem;opacity:.45;margin-top:2px;text-align:center;font-style:italic}
+body.night .hdew{color:#7c8a99}
+body.night .hlim{color:#5a6a78}
+.cpu.warn{color:#ffb866}
+.cpu.hot{color:#ef9a9a}
+.navico{width:13px;height:10px;vertical-align:middle;margin-right:4px;opacity:.75;fill:currentColor}
+
+/* Bouton lieu (modification localisation) */
+.locrow{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-align:center;-webkit-align-items:center;align-items:center;-webkit-box-pack:center;-webkit-justify-content:center;justify-content:center}
+.locbtn{font-size:.78rem;opacity:.7;margin-top:3px;text-align:center;background:none;border:none;color:#fff;cursor:pointer;display:inline-block;font-weight:400}
+.locico{width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,.16);color:#fff;cursor:pointer;margin-top:3px;margin-left:10px;opacity:.8;line-height:28px;padding:0}
+.locico .ric{width:15px;height:15px;vertical-align:middle}
+body.night .locico{background:rgba(100,120,150,.3);color:#8aa0b0}
+
+/* Fenetre de configuration premiere localisation */
+.loc-overlay{position:fixed;inset:0;z-index:50;background:rgba(18,26,40,.97);color:#fff;display:none;-webkit-box-orient:vertical;-webkit-flex-direction:column;flex-direction:column;-webkit-box-align:center;-webkit-align-items:center;align-items:center;-webkit-box-pack:center;-webkit-justify-content:center;justify-content:center;padding:22px;text-align:center}
+.loc-overlay h2{font-weight:300;font-size:1.4rem;margin-bottom:18px}
+.loc-input{padding:12px 14px;border-radius:12px;border:none;font-size:16px;width:86%;max-width:360px;margin-bottom:12px;-webkit-appearance:none}
+.loc-btn{margin:6px 0;padding:11px 22px;border:none;border-radius:12px;font-size:14px;font-weight:600;color:#fff;background:rgba(255,255,255,.22);cursor:pointer}
+.loc-results{margin-top:16px;width:92%;max-width:420px;max-height:46%;overflow:auto;-webkit-overflow-scrolling:touch}
+.loc-res{display:block;width:100%;text-align:left;padding:12px 14px;margin:6px 0;border-radius:12px;border:none;background:rgba(255,255,255,.12);color:#fff;font-size:15px;cursor:pointer}
+.loc-res.sel{background:rgba(255,255,255,.34)}
+</style>
+</head>
+<body>
+<div id="bg" class="bg-warm"></div>
+<div id="fx">
+  <div id="part"></div>
+  <div id="cldW"><div class="cld c1"></div><div class="cld c2"></div><div class="cld c3"></div></div>
+  <div id="rainW"></div>
+  <div id="snowW"></div>
+  <div id="litW"></div>
+</div>
+<div id="ui">
+  <div class="hdr">
+    <a href="charts.html?v=2" class="nav"><svg class="navico" viewBox="0 0 16 12" aria-hidden="true"><rect x="1" y="7" width="3" height="5"/><rect x="6" y="4" width="3" height="8"/><rect x="11" y="1" width="3" height="11"/></svg> Stats</a>
+    <div class="dt">
+      <div class="dt-day" id="tDay">--</div>
+      <div class="dt-time" id="tTime">--:--</div>
+      <div class="dt-date" id="tDate">--</div>
+      <div class="dt-saint" id="tSaint"></div>
+    </div>
+    <div class="pill"><span class="dot" id="dot"></span><span id="smsg">--</span><span id="cpu" class="cpu"></span></div>
+  </div>
+  <div class="hero">
+    <div class="lbl">Temperature actuelle</div>
+    <div class="val" id="vT">--<span class="u">&deg;</span></div>
+    <div class="sub" id="vTm">--</div>
+  </div>
+  <div class="hum">Humidité <span id="vH">--%</span><span id="hCat"></span></div>
+  <div class="hdew" id="hDew"></div>
+  <div class="hlim" id="hLim" style="display:none"></div>
+  <button class="btn" id="btnL">&#9889; Mesurer</button>
+  <div class="nsched" id="nsched"></div>
+  <div class="fc"><div class="fs" id="fcS"></div></div>
+  <div class="src" id="src">Previsions : Open-Meteo.com</div>
+  <div class="locrow">
+    <button class="locbtn" id="locBtn">Lieu : …</button>
+    <button class="locico" id="locReset" title="Reinitialiser la commune" aria-label="Reinitialiser la commune"><svg class="ric" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
+  </div>
+</div>
+<button class="night-toggle" id="nightBtn" title="Mode nuit">&#9790;</button>
+
+<div class="loc-overlay" id="locOverlay">
+  <h2>Configurer les previsions meteo</h2>
+  <input class="loc-input" id="locInput" type="text" placeholder="Commune ou code postal" autocomplete="off" />
+  <button class="loc-btn" id="locSearch">Rechercher</button>
+  <div class="loc-results" id="locResults"></div>
+  <button class="loc-btn" id="locConfirm" style="display:none">Utiliser cette localisation</button>
+</div>
+
+<script src="app.js?v=18"></script>
+</body>
+</html>

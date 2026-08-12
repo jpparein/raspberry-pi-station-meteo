@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Meteo">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Statistiques - Station Meteo</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+html,body{height:100%}
+
+body{
+  font-family:Helvetica,Arial,sans-serif;
+  color:#fff;
+  overflow:hidden;
+  background:#333
+}
+
+#bg{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  z-index:0;
+  background:#333;
+  -webkit-transition:background 1.5s;
+  transition:background 1.5s
+}
+
+#bg.bg-hot{
+  background:linear-gradient(180deg,#ff6f00 0%,#d84315 60%,#b71c1c 100%)
+}
+
+#bg.bg-warm{
+  background:linear-gradient(180deg,#ffa726 0%,#f57c00 60%,#e65100 100%)
+}
+
+#bg.bg-mild{
+  background:linear-gradient(180deg,#66bb6a 0%,#43a047 60%,#2e7d32 100%)
+}
+
+#bg.bg-cool{
+  background:linear-gradient(180deg,#42a5f5 0%,#1e88e5 60%,#1565c0 100%)
+}
+
+#bg.bg-cold{
+  background:linear-gradient(180deg,#90a4ae 0%,#607d8b 60%,#455a64 100%)
+}
+
+#wrap{
+  position:relative;
+  z-index:2;
+  height:100%;
+  display:-webkit-box;
+  display:-webkit-flex;
+  display:flex;
+  -webkit-box-orient:vertical;
+  -webkit-box-direction:normal;
+  -webkit-flex-direction:column;
+  flex-direction:column;
+  padding:74px 12px 12px
+}
+
+.hdr{
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  display:-webkit-box;
+  display:-webkit-flex;
+  display:flex;
+  -webkit-box-align:center;
+  -webkit-align-items:center;
+  align-items:center;
+  -webkit-box-pack:justify;
+  -webkit-justify-content:space-between;
+  justify-content:space-between;
+  padding:10px 14px;
+  z-index:3
+}
+
+.back{
+  color:#fff;
+  text-decoration:none;
+  font-size:14px;
+  padding:6px 12px;
+  border-radius:12px;
+  background:rgba(255,255,255,.2)
+}
+
+.dt{
+  position:absolute;
+  left:50%;
+  top:4px;
+  -webkit-transform:translateX(-50%);
+  transform:translateX(-50%);
+  text-align:center;
+  pointer-events:none
+}
+
+.dt-day{
+  font-size:14px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  opacity:.6
+}
+
+.dt-time{
+  font-size:34px;
+  font-weight:300;
+  line-height:1.05;
+  text-shadow:0 1px 6px rgba(0,0,0,.15)
+}
+
+.dt-date{
+  font-size:14px;
+  opacity:.6
+}
+
+.dt-saint{
+  font-size:14px;
+  opacity:.8;
+  margin-top:2px;
+  font-style:italic
+}
+
+.spacer{width:60px}
+
+.stats{
+  display:-webkit-box;
+  display:-webkit-flex;
+  display:flex;
+  gap:10px;
+  margin-bottom:10px
+}
+
+.scard{
+  -webkit-flex:1;
+  flex:1;
+  background:rgba(255,255,255,.12);
+  border-radius:16px;
+  padding:12px;
+  -webkit-backdrop-filter:blur(4px);
+  backdrop-filter:blur(4px)
+}
+
+.scard-title{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  opacity:.6;
+  margin-bottom:8px
+}
+
+.srow{
+  display:-webkit-box;
+  display:-webkit-flex;
+  display:flex;
+  -webkit-box-pack:justify;
+  -webkit-justify-content:space-between;
+  justify-content:space-between;
+  -webkit-box-align:center;
+  -webkit-align-items:center;
+  align-items:center
+}
+
+.sval{
+  text-align:center;
+  -webkit-flex:1;
+  flex:1
+}
+
+.sval .num{
+  font-size:1.2rem;
+  font-weight:700
+}
+
+.sval .lbl{
+  font-size:10px;
+  opacity:.55;
+  text-transform:uppercase;
+  margin-top:1px
+}
+
+.sval.min .num{color:#81d4fa}
+.sval.max .num{color:#fff}
+.sval.avg .num{color:#69f0ae}
+
+.ssep{
+  width:1px;
+  height:24px;
+  background:rgba(255,255,255,.15)
+}
+
+.ctabs{
+  display:-webkit-box;
+  display:-webkit-flex;
+  display:flex;
+  gap:6px;
+  margin-bottom:10px
+}
+
+.ctab{
+  -webkit-flex:1;
+  flex:1;
+  padding:9px;
+  border:none;
+  border-radius:12px;
+  background:rgba(255,255,255,.12);
+  color:rgba(255,255,255,.7);
+  font-size:14px;
+  font-weight:500;
+  cursor:pointer
+}
+
+.ctab.active{
+  background:rgba(255,255,255,.32);
+  color:#fff;
+  font-weight:700
+}
+
+.cbox{
+  -webkit-flex:1;
+  flex:1;
+  background:rgba(255,255,255,.10);
+  border-radius:16px;
+  padding:8px;
+  overflow:hidden;
+  position:relative
+}
+
+canvas{
+  display:block;
+  width:100%;
+  height:100%
+}
+</style>
+</head>
+
+<body>
+
+<div id="bg" class="bg-warm"></div>
+
+<div id="wrap">
+
+  <div class="hdr">
+
+    <a href="index.html" class="back">&#8592; Retour</a>
+
+    <div class="dt">
+      <div class="dt-day" id="tDay">--</div>
+      <div class="dt-time" id="tTime">--:--</div>
+      <div class="dt-date" id="tDate">--</div>
+      <div class="dt-saint" id="tSaint"></div>
+    </div>
+
+    <div class="spacer"></div>
+
+  </div>
+
+  <div class="stats">
+
+    <div class="scard">
+
+      <div class="scard-title">24h Temperature</div>
+
+      <div class="srow">
+
+        <div class="sval min">
+          <div class="num" id="tMin">--</div>
+          <div class="lbl">min</div>
+        </div>
+
+        <div class="ssep"></div>
+
+        <div class="sval avg">
+          <div class="num" id="tAvg">--</div>
+          <div class="lbl">moy</div>
+        </div>
+
+        <div class="ssep"></div>
+
+        <div class="sval max">
+          <div class="num" id="tMax">--</div>
+          <div class="lbl">max</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="scard">
+
+      <div class="scard-title">24h Humidite</div>
+
+      <div class="srow">
+
+        <div class="sval min">
+          <div class="num" id="hMin">--</div>
+          <div class="lbl">min</div>
+        </div>
+
+        <div class="ssep"></div>
+
+        <div class="sval avg">
+          <div class="num" id="hAvg">--</div>
+          <div class="lbl">moy</div>
+        </div>
+
+        <div class="ssep"></div>
+
+        <div class="sval max">
+          <div class="num" id="hMax">--</div>
+          <div class="lbl">max</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div class="ctabs">
+    <button class="ctab active" data-r="24h">24 h</button>
+    <button class="ctab" data-r="7j">7 jours</button>
+    <button class="ctab" data-r="30j">30 jours</button>
+  </div>
+
+  <div class="cbox">
+    <canvas id="chart"></canvas>
+  </div>
+
+</div>
+
+<script>
+var API='api.php';
+var cRange='24h';
+
+var cvs=document.getElementById('chart');
+var ctx=cvs.getContext('2d');
+var cbox=document.querySelector('.cbox');
+
+function $(id){
+  return document.getElementById(id);
+}
+
+function fetchJSON(u,cb){
+  var x=new XMLHttpRequest();
+
+  x.open('GET',API+'?action='+u,true);
+
+  x.onload=function(){
+    try{
+      cb(JSON.parse(x.responseText));
+    }catch(e){}
+  };
+
+  x.send();
+}
+
+function setTmpBg(t){
+  if(t>=28){
+    $('bg').className='bg-hot';
+  }
+  else if(t>=24){
+    $('bg').className='bg-warm';
+  }
+  else if(t>=20){
+    $('bg').className='bg-mild';
+  }
+  else if(t>=15){
+    $('bg').className='bg-cool';
+  }
+  else{
+    $('bg').className='bg-cold';
+  }
+}
+
+function refreshBg(){
+  fetchJSON('current',function(d){
+    if(!d.error){
+      setTmpBg(d.temperature);
+    }
+  });
+}
+
+function tick(){
+  var n=new Date();
+
+  var D=[
+    'dimanche',
+    'lundi',
+    'mardi',
+    'mercredi',
+    'jeudi',
+    'vendredi',
+    'samedi'
+  ];
+
+  var M=[
+    'janvier',
+    'fevrier',
+    'mars',
+    'avril',
+    'mai',
+    'juin',
+    'juillet',
+    'aout',
+    'septembre',
+    'octobre',
+    'novembre',
+    'decembre'
+  ];
+
+  $('tDay').textContent=D[n.getDay()];
+
+  $('tTime').textContent=
+    ('0'+n.getHours()).slice(-2)+
+    ':'+
+    ('0'+n.getMinutes()).slice(-2);
+
+  $('tDate').textContent=
+    n.getDate()+
+    ' '+
+    M[n.getMonth()]+
+    ' '+
+    n.getFullYear();
+}
+
+function loadStats(){
+  fetchJSON('stats_24h',function(d){
+
+    if(d.error){
+      return;
+    }
+
+    $('tMin').textContent=d.min_temp+'\u00B0';
+    $('tMax').textContent=d.max_temp+'\u00B0';
+    $('tAvg').textContent=d.avg_temp+'\u00B0';
+
+    $('hMin').textContent=d.min_hum+'%';
+    $('hMax').textContent=d.max_hum+'%';
+    $('hAvg').textContent=d.avg_hum+'%';
+  });
+}
+
+function loadChart(r){
+  cRange=r;
+
+  fetchJSON('chart_'+r,function(d){
+    drawChart(d);
+  });
+}
+
+function drawChart(data){
+  var W=cvs.width=cbox.clientWidth-16;
+  var H=cvs.height=cbox.clientHeight-16;
+
+  ctx.clearRect(0,0,W,H);
+
+  if(!data || data.length<2){
+    ctx.fillStyle='rgba(255,255,255,.6)';
+    ctx.font='14px sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText('En attente de donnees...',W/2,H/2);
+    return;
+  }
+
+  var pL=40;
+  var pR=10;
+  var pT=22;
+  var pB=24;
+  var cW=W-pL-pR;
+  var cH=H-pT-pB;
+
+  var temps=data.map(function(d){
+    return d.temp;
+  });
+
+  var gMin=Math.min.apply(null,temps);
+  var gMax=Math.max.apply(null,temps);
+
+  if(gMax-gMin<2){
+    gMin-=1;
+    gMax+=1;
+  }
+
+  var gR=gMax-gMin;
+
+  ctx.strokeStyle='rgba(255,255,255,.15)';
+  ctx.lineWidth=.5;
+
+  for(var i=0;i<=4;i++){
+    var y=pT+cH*(1-i/4);
+
+    ctx.beginPath();
+    ctx.moveTo(pL,y);
+    ctx.lineTo(W-pR,y);
+    ctx.stroke();
+
+    ctx.fillStyle='rgba(255,255,255,.55)';
+    ctx.font='10px sans-serif';
+    ctx.textAlign='right';
+
+    ctx.fillText(
+      (gMin+gR*i/4).toFixed(1),
+      pL-5,
+      y+3
+    );
+  }
+
+  ctx.strokeStyle='#ffb74d';
+  ctx.lineWidth=2.5;
+  ctx.beginPath();
+
+  for(var i=0;i<data.length;i++){
+    var x=pL+cW*i/(data.length-1);
+    var y=pT+cH*(1-(data[i].temp-gMin)/gR);
+
+    if(i===0){
+      ctx.moveTo(x,y);
+    }else{
+      ctx.lineTo(x,y);
+    }
+  }
+
+  ctx.stroke();
+
+  ctx.globalAlpha=.08;
+  ctx.fillStyle='#ffb74d';
+
+  ctx.lineTo(pL+cW,pT+cH);
+  ctx.lineTo(pL,pT+cH);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.globalAlpha=1;
+
+  ctx.fillStyle='rgba(255,255,255,.55)';
+  ctx.font='9px sans-serif';
+  ctx.textAlign='center';
+
+  var step=Math.max(1,Math.floor(data.length/7));
+
+  for(var i=0;i<data.length;i+=step){
+    var x=pL+cW*i/(data.length-1);
+    var t=data[i].t.split(' ')[1] || data[i].t;
+
+    ctx.fillText(
+      t.substring(0,5),
+      x,
+      H-5
+    );
+  }
+
+  ctx.font='11px sans-serif';
+  ctx.fillStyle='#ffb74d';
+
+  ctx.fillText(
+    '\u25CF Temperature',
+    pL+20,
+    pT-7
+  );
+}
+
+document.querySelectorAll('.ctab').forEach(function(t){
+
+  t.addEventListener('click',function(){
+
+    document.querySelectorAll('.ctab').forEach(function(x){
+      x.classList.remove('active');
+    });
+
+    t.classList.add('active');
+
+    loadChart(t.getAttribute('data-r'));
+  });
+
+});
+
+function resize(){
+  loadChart(cRange);
+}
+
+window.addEventListener('resize',resize);
+
+window.addEventListener('orientationchange',function(){
+  setTimeout(resize,300);
+});
+
+tick();
+setInterval(tick,10000);
+
+refreshBg();
+setInterval(refreshBg,60000);
+
+loadStats();
+loadChart('24h');
+
+setInterval(loadStats,60000);
+</script>
+
+</body>
+</html>

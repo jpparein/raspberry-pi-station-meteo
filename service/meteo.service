@@ -1,0 +1,17 @@
+[Unit]
+Description=Station Meteo - Collecte DHT22
+After=network.target
+
+[Service]
+Type=simple
+User=rpi
+Group=rpi
+WorkingDirectory=/home/rpi/meteo
+ExecStart=/home/rpi/meteo-env/bin/python3 /home/rpi/meteo/collect.py
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

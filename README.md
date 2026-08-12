@@ -254,6 +254,8 @@ Activez les en-têtes anti-cache :
 ```bash
 sudo a2enmod headers
 ```
+Le module headers permet à Apache de demander au navigateur de ne pas conserver trop longtemps les anciens fichiers du site.
+C’est particulièrement utile avec le vieil iPad, qui peut parfois s’accrocher à une ancienne version de la page comme si elle avait une valeur sentimentale. Sans cette option, vous modifiez le programme… mais Safari continue tranquillement d’afficher la version précédente.
 
 Dans `/etc/apache2/apache2.conf`, vérifiez que le bloc concernant `/var/www/` autorise le fichier `.htaccess` :
 

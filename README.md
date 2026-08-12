@@ -1,5 +1,14 @@
 # Station météo Raspberry Pi : opération vide-tiroirs !
 
+![Raspberry Pi](https://img.shields.io/badge/Raspberry%20Pi-2B-C51A4A?logo=raspberrypi&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3-3776AB?logo=python&logoColor=white)
+![PHP](https://img.shields.io/badge/PHP-Apache-777BB4?logo=php&logoColor=white)
+![SQLite](https://img.shields.io/badge/Base-SQLite-003B57?logo=sqlite&logoColor=white)
+![Capteur](https://img.shields.io/badge/Capteur-DHT22-43A047)
+![iOS](https://img.shields.io/badge/Compatible-iOS%2012-000000?logo=apple&logoColor=white)
+![Projet](https://img.shields.io/badge/Projet-100%25%20récup-orange)
+![Statut](https://img.shields.io/badge/Statut-Fonctionnel-brightgreen)
+
 Tout est parti d’un constat très scientifique : chez moi, j’avais un **Raspberry Pi 2B**, une vieille **clé Wi-Fi**, un **iPad Air sous iOS 12.5.7**, un ancien câble téléphonique RJ11 et quelques composants qui dormaient tranquillement dans mes tiroirs.
 
 Je n’ai pas acheté un lot de vieux matériel spécialement pour prétendre faire de la récupération : ce sont réellement des choses que je possédais déjà chez moi et qui ne servaient plus. Plutôt que de les laisser poursuivre leur carrière de ramasse-poussière, j’ai décidé d’en faire une station météo locale avec un capteur **DHT22 / AM2302**. Elle mesure la température et l’humidité, conserve un historique, affiche les prévisions et transforme l’ancien iPad en écran permanent.

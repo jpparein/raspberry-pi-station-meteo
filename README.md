@@ -104,8 +104,6 @@ Le repérage `+`, `OUT` et `−` évite de jouer à la loterie au moment du bran
 
 ![Branchement sur le Raspberry Pi](docs/images/06-branchement-raspberry-pi.jpg)
 
-![Raccordement du câble téléphonique](docs/images/07-raccordement-cable-rj11.jpg)
-
 ## Installation extérieure
 
 Le capteur doit être placé :

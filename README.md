@@ -198,7 +198,7 @@ Avec Git :
 
 ```bash
 cd /home/rpi
-git clone URL_DE_VOTRE_DEPOT station-meteo
+git clone https://github.com/jpparein/raspberry-pi-station-meteo.git station-meteo
 ```
 
 Ou copiez manuellement le dossier du projet dans :

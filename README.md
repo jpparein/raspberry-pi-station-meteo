@@ -10,11 +10,11 @@
 
 Tout est parti d'un constat très scientifique : chez moi, j'avais un **Raspberry Pi 2B**, une vieille **clé Wi-Fi**, un **iPad Air sous iOS 12.5.7**, un ancien câble téléphonique RJ11 et quelques composants qui dormaient tranquillement dans mes tiroirs.
 
-Plutôt que de les laisser poursuivre leur carrière de ramasse-poussière, j'ai décidé d'en faire une station météo locale. Elle mesure la température, l'humidité et la pression, conserve un historique, affiche les prévisions, la qualité de l'air, les pollens, les informations solaires et transforme l'ancien iPad en écran permanent.
+Plutôt que de les laisser poursuivre leur carrière de ramasse-poussière, j'ai décidé d'en faire une station météo locale. Elle mesure la température, l'humidité et la pression, conserve un historique, affiche les prévisions, la qualité de l'air, les pollens, les informations solaires et transforme un ancien écran (iPad, tablette Android, etc.) en écran permanent.
 
 Le résultat n'a évidemment pas vocation à concurrencer Météo-France, mais il est plutôt complet pour un projet fabriqué essentiellement avec ce que j'avais déjà sous la main.
 
-![Station météo affichée sur un ancien iPad](docs/images/interface%20v2.png)
+![Station météo affichée sur une tablette](docs/images/interface%20v2.png)
 
 ## Nouveautés v2
 
@@ -95,7 +95,7 @@ flowchart TD
     C --> D["API PHP"]
     E["Open-Meteo"] --> D
     D --> G["Interface web"]
-    G --> H["PC, mobile ou ancien iPad"]
+    G --> H["PC, mobile ou ancienne tablette"]
 ```
 
 Le service `meteo-v2.service` garde `collect.py` éveillé. Le script lit le capteur sur le GPIO, puis ajoute une mesure à SQLite environ toutes les cinq minutes. Apache et PHP transforment ensuite ces données en JSON pour l'interface web.
@@ -187,14 +187,14 @@ L'installateur va :
 4. Configurer le service systemd ;
 5. Démarrer la station.
 
-## Donner une seconde vie à l'ancien iPad
+## Donner une seconde vie à un ancien écran
 
-1. Ouvrez l'adresse de la station dans Safari sur l'iPad.
+1. Ouvrez l'adresse de la station dans le navigateur de la tablette.
 2. Utilisez le menu de partage.
 3. Choisissez **Sur l'écran d'accueil**.
 4. Lancez ensuite l'icône créée.
 
-L'iPad est ancien, Safari aussi, et tous deux ont parfois des opinions très arrêtées sur le JavaScript moderne. L'interface utilise donc `XMLHttpRequest`, des préfixes `-webkit-` et une syntaxe compatible avec iOS 12.5.7.
+Que ce soit un ancien iPad sous iOS 12, une tablette Android ancienne ou un simple téléphone, l'interface utilise `XMLHttpRequest`, des préfixes `-webkit-` et une syntaxe compatible avec les navigateurs datant.
 
 ## Commandes utiles
 

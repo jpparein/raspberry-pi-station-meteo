@@ -133,7 +133,7 @@ Le bouton **Mesurer** utilise `live_read.py`. Il permet de satisfaire immédiate
 
 ![Capteur barométrique](docs/images/CapteurBarometrique.jpg)
 
-> Le BMP280 nécessite l'activation du bus I2C. L'installateur s'en charge automatiquement. Une règle udev est ajoutée pour permettre au serveur web (www-data) d'accéder au bus I2C.
+> Le BMP280 nécessite l'activation du bus I2C. L'installateur s'en charge automatiquement. Une règle udev est ajoutée pour permettre au serveur web (www-data) d'accéder au bus I2C. Contrairement au DHT22 qui doit sortir à l'extérieur, le BMP280 peut rester à côté du Raspberry Pi à l'intérieur : la pression atmosphérique ne change pas entre l'intérieur et l'extérieur (vos portes et fenêtres ne sont pas hermétiques, elles sifflent un peu). Des fils Dupont classiques suffisent pour le raccorder.
 
 ## Étape 3 — Préparer le câble récupéré
 

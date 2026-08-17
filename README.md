@@ -120,6 +120,35 @@ Si un BMP280 est connecté, la pression atmosphérique est enregistrée en même
 
 Le bouton **Mesurer** utilise `live_read.py`. Il permet de satisfaire immédiatement le classique « oui, mais combien fait-il maintenant ? ». Cette lecture actualise l'écran sans être enregistrée : les statistiques restent basées uniquement sur les mesures automatiques.
 
+## Structure du dépôt
+
+```text
+.
+├── README.md
+├── LICENSE
+├── .gitignore
+├── install.sh
+├── uninstall.sh
+├── requirements.txt
+├── web/
+│   ├── index.html          ← page principale
+│   ├── charts.html         ← statistiques
+│   ├── api.php             ← API JSON
+│   ├── app.js              ← JavaScript
+│   └── .htaccess           ← cache désactivé
+├── scripts/
+│   ├── collect.py          ← collecte DHT22 (service)
+│   └── live_read.py        ← mesure instantanée
+├── service/
+│   └── meteo.service       ← service systemd
+├── database/
+│   └── schema.sql          ← schéma SQLite
+├── config/
+│   └── location.example.json
+└── docs/
+    └── images/
+```
+
 ---
 
 # Partie 1 — Câblage et installation matérielle

@@ -521,7 +521,7 @@ LIVE_EOF
 # ============================================================================
 copy_web_files() {
     info "Copie du frontend web..."
-    cp -r "$SCRIPT_DIR/web/"* "$INSTALL_DIR/web/" 2>/dev/null || true
+    cp -r "$SCRIPT_DIR/web/." "$INSTALL_DIR/web/" 2>/dev/null || true
     success "Fichiers web copiés"
 
     info "Correction des chemins dans api.php..."

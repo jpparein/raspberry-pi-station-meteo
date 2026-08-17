@@ -166,9 +166,9 @@ Ici, il est installé sous un avant-toit. La fixation fait appel à une technolo
 
 ![Installation extérieure du capteur](docs/images/11-installation-capteur-exterieur.png)
 
-Le Raspberry Pi reste à l'intérieur, près du routeur, posé sur une brique — un support sans ventilateur, sans vis et garanti totalement compatible avec le Raspberry Pi.
+Le Raspberry Pi reste à l'intérieur, près du routeur, avec les deux capteurs raccordés.
 
-![Raspberry Pi et clé Wi-Fi près du routeur](docs/images/10-installation-raspberry-et-wifi.png)
+![Montage final avec DHT22 et BMP280](docs/images/MontageFinal.jpg)
 
 ## Installation logicielle
 

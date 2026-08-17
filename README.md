@@ -139,8 +139,6 @@ Le repérage `+`, `OUT` et `−` évite de jouer à la loterie au moment du bran
 
 ### Côté Raspberry Pi
 
-![Branchement sur le Raspberry Pi](docs/images/06-branchement-raspberry-pi.jpg)
-
 ![Montage final](docs/images/MontageFinal.jpg)
 
 ## Installation extérieure

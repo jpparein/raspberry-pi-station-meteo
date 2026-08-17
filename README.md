@@ -22,20 +22,30 @@ Le résultat n'a évidemment pas vocation à concurrencer Météo-France, mais i
 
 ## Ce qu'elle sait faire
 
+### Mesures et données
 - mesure locale de la température et de l'humidité avec un **DHT11** ou **DHT22** ;
 - **baromètre BMP280** en option (pression atmosphérique) ;
 - collecte automatique environ toutes les 5 minutes ;
 - stockage des mesures dans une base SQLite ;
 - mesure instantanée à la demande, sans l'enregistrer dans l'historique ;
-- statistiques sur 24 heures et graphiques sur 24 heures, 7 jours et 30 jours ;
+- statistiques sur 24 heures (min, moyenne, max) ;
+- graphiques sur 24 heures, 7 jours et 30 jours ;
 - prévisions horaires fournies par Open-Meteo ;
-- choix de la commune au premier lancement ;
-- mode nuit automatique selon le lever et le coucher du soleil locaux ;
+- choix de la commune au premier lancement.
+
+### Interface et affichage
 - animations adaptées à la météo : soleil, nuages, pluie, neige et orage ;
 - catégorie d'humidité et calcul du point de rosée ;
 - affichage discret de la température du processeur du Raspberry Pi ;
-- interface tactile compatible avec Safari sous iOS 12.5.7 ;
+- interface tactile compatible avec Safari sous iOS 12.5.7.
+
+### Modes d'économie
+- **mode nuit** : se déclenche automatiquement selon le lever et le coucher du soleil de la commune configurée, avec basculement manuel possible ;
+- **mode économie** : désactive les animations et les particules pour réduire la charge CPU, idéal sur les anciens Raspberry Pi.
+
+### Installation
 - installation automatisée en une seule commande ;
+- détection automatique des capteurs ;
 - aucun compte en ligne et aucune clé API nécessaires.
 
 > Les mesures et l'historique restent à la maison, sur le Raspberry Pi. Seules les prévisions et les heures de lever/coucher du soleil nécessitent Internet via Open-Meteo.

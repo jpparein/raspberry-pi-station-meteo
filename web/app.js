@@ -1,4 +1,4 @@
-var A='api.php',curFx='';
+﻿var A='api.php',curFx='';
 var bg=document.getElementById('bg');
 var part=document.getElementById('part');
 var cldW=document.getElementById('cldW');
@@ -7,13 +7,68 @@ var snowW=document.getElementById('snowW');
 var litW=document.getElementById('litW');
 var IC={};
 IC[0]='sun';IC[1]='sun';IC[2]='part';IC[3]='cloud';
-IC[45]='snow';IC[48]='snow';
+IC[45]='fog';IC[48]='fog';
 IC[51]='rain';IC[53]='rain';IC[55]='rain';
 IC[61]='rain';IC[63]='rain';IC[65]='rain';
 IC[71]='snow';IC[73]='snow';IC[75]='snow';IC[77]='snow';
 IC[80]='rain';IC[81]='rain';IC[82]='rain';
 IC[85]='snow';IC[86]='snow';
 IC[95]='storm';IC[96]='storm';IC[99]='storm';
+
+var SVGICO={};
+SVGICO.sun='<g class="f-sun">'
+  +'<rect x="19" y="3" width="2" height="8" rx="1"/>'
+  +'<rect x="19" y="3" width="2" height="8" rx="1" transform="rotate(45 20 20)"/>'
+  +'<rect x="19" y="3" width="2" height="8" rx="1" transform="rotate(90 20 20)"/>'
+  +'<rect x="19" y="3" width="2" height="8" rx="1" transform="rotate(135 20 20)"/>'
+  +'<rect x="19" y="3" width="2" height="8" rx="1" transform="rotate(180 20 20)"/>'
+  +'<rect x="19" y="3" width="2" height="8" rx="1" transform="rotate(225 20 20)"/>'
+  +'<rect x="19" y="3" width="2" height="8" rx="1" transform="rotate(270 20 20)"/>'
+  +'<rect x="19" y="3" width="2" height="8" rx="1" transform="rotate(315 20 20)"/>'
+  +'<circle cx="20" cy="20" r="8.5"/>'
+  +'</g>';
+SVGICO.moon='<path class="f-moon" d="M35 21.3A15 15 0 1 1 18.7 5 11.7 11.7 0 0 0 35 21.3z"/>';
+SVGICO.part='<circle class="f-sun" cx="12" cy="14" r="6"/>'
+  +'<g class="f-cloud">'
+  +'<rect x="15" y="21" width="19" height="9" rx="4.5"/>'
+  +'<circle cx="20" cy="21" r="6"/>'
+  +'<circle cx="26" cy="19" r="7"/>'
+  +'</g>';
+SVGICO.cloud='<g class="f-cloud">'
+  +'<rect x="7" y="22" width="26" height="9" rx="4.5"/>'
+  +'<circle cx="14" cy="22" r="7.5"/>'
+  +'<circle cx="22" cy="19" r="9"/>'
+  +'<circle cx="28" cy="22" r="6"/>'
+  +'</g>';
+SVGICO.rain='<g class="f-cloud">'
+  +'<rect x="8" y="12" width="24" height="9" rx="4.5"/>'
+  +'<circle cx="15" cy="12" r="7"/>'
+  +'<circle cx="23" cy="9.5" r="8"/>'
+  +'</g>'
+  +'<g class="f-rain" fill="none" stroke-width="2.6" stroke-linecap="round">'
+  +'<line x1="13" y1="26" x2="11" y2="32"/>'
+  +'<line x1="20" y1="27" x2="18" y2="33"/>'
+  +'<line x1="27" y1="26" x2="25" y2="32"/>'
+  +'</g>';
+SVGICO.snow='<g class="f-cloud">'
+  +'<rect x="8" y="12" width="24" height="9" rx="4.5"/>'
+  +'<circle cx="15" cy="12" r="7"/>'
+  +'<circle cx="23" cy="9.5" r="8"/>'
+  +'</g>'
+  +'<g class="f-snow">'
+  +'<circle cx="13" cy="28" r="2"/>'
+  +'<circle cx="20" cy="30" r="2"/>'
+  +'<circle cx="27" cy="28" r="2"/>'
+  +'</g>';
+SVGICO.storm='<g class="f-cloud">'
+  +'<rect x="8" y="12" width="24" height="9" rx="4.5"/>'
+  +'<circle cx="15" cy="12" r="7"/>'
+  +'<circle cx="23" cy="9.5" r="8"/>'
+  +'</g>'
+  +'<polyline class="f-bolt" fill="none" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" points="19,24 13,32 18,32 15,38 25,29 19,29 22,24"/>';
+SVGICO.fog='<rect class="f-fog" x="8" y="13" width="24" height="4" rx="2"/>'
+  +'<rect class="f-fog" x="11" y="21" width="18" height="4" rx="2"/>'
+  +'<rect class="f-fog" x="8" y="29" width="24" height="4" rx="2"/>';
 
 var SAINTS={};
 SAINTS['1']=['','Odilon','Basile','Genevieve, Genevra','Odilon, Odil','Edouard','Melchior','Raymond, Raymonde','Lucien, Lucienne','Alix, Alice','Guillaume, Guilhem','Paulin','Tatiana','Yvette','Nina','Remi','Marcel, Marcelle','Roseline','Prisca','Marius','Sebastien, Sebastienne','Agnes, Ines','Vincent','Barnard','Francois de Sales','Paul, Paula','Paule','Angele','Thomas','Gildas','Martine','Marcelle'];
@@ -100,6 +155,7 @@ PAL_NIGHT[3]=['rgba(70,120,170,.14)','rgba(110,150,190,.12)','rgba(90,130,180,.1
 PAL_NIGHT[4]=['rgba(60,110,160,.12)','rgba(100,140,180,.11)','rgba(80,120,170,.12)'];
 
 var nightMode=false;
+var ecoMode=true;
 
 function isNight(){
   var h=new Date().getHours();
@@ -108,14 +164,24 @@ function isNight(){
 
 function setNight(on){
   nightMode=on;
-  document.body.className=on?'night':'';
+  document.body.className=(on?'night':'')+(ecoMode?' eco':'');
   var btn=$('nightBtn');
-  if(btn)btn.textContent=on?'☀':'☾';
+  if(btn)btn.textContent=on?'ÔÿÇ':'Ôÿ¥';
   upd();
 }
 
 function toggleNight(){
   setNight(!nightMode);
+}
+
+function setEco(on){
+  ecoMode=on;
+  document.body.className=(nightMode?'night':'')+(on?' eco':'');
+  if(!on)upd();
+}
+
+function toggleEco(){
+  setEco(!ecoMode);
 }
 var sunSched={t:0,on:false},sunTimer=null,lastFc=null;
 function parseSun(s){
@@ -128,7 +194,6 @@ function fmtHM(x){
   var h=x.getHours(),m=x.getMinutes();
   return (h<10?'0':'')+h+':'+(m<10?'0':'')+m;
 }
-function captionSun(t){var e=$('nsched');if(e)e.textContent=t;}
 function doSwitch(){setNight(sunSched.on);if(lastFc)applySun(lastFc);}
 function scheduleSwitch(target,on){
   sunSched.t=target.getTime();sunSched.on=on;
@@ -149,10 +214,67 @@ function applySun(d){
   if(nightMode!==night)setNight(night);
   if(night){
     scheduleSwitch(nextSr,false);
-    captionSun('Passage en mode jour au lever du soleil à '+fmtHM(nextSr));
   }else{
     scheduleSwitch(ss,true);
-    captionSun('Passage en mode nuit au coucher du soleil à '+fmtHM(ss));
+  }
+}
+function pluieInfo(d){
+  var e=$('nsched');if(!e)return;
+  if(!e._clickSet){
+    e._clickSet=true;
+    e.onclick=function(){location.href='previsions.html';};
+    e.style.cursor='pointer';
+    e.style.webkitUserSelect='none';e.style.userSelect='none';
+  }
+  if(!d||!d.hourly||!d.hourly.length){e.textContent='Aucune pluie prevue dans les prochaines 24 h';return;}
+  var now=new Date();
+  var hh=('0'+now.getHours()).slice(-2)+':00';
+  var foundRain=false;
+  var foundRisk=false;
+  var startH=new Date();
+  var startHR=new Date();
+  var dur=0;
+  var durR=0;
+  var cum=0;
+  var seen=0;
+  var i;
+  for(i=0;i<d.hourly.length;i++){
+    var x=d.hourly[i];
+    if(x.time<hh)continue;
+    if(seen>=24)break;
+    seen++;
+    var prob=(typeof x.pprob==='number')?x.pprob:0;
+    var mm=(typeof x.pmm==='number')?x.pmm:0;
+    var pluieReelle=(mm>0);
+    var pluieRisque=(prob>=30&&mm===0);
+    if(pluieReelle&&!foundRain){
+      foundRain=true;
+      startH.setHours(+x.time.slice(0,2),0,0,0);
+      dur=1;
+      cum+=mm;
+    }else if(foundRain&&pluieReelle){
+      dur++;
+      cum+=mm;
+    }else if(foundRain&&!pluieReelle){
+      break;
+    }
+    if(pluieRisque&&!foundRisk&&!foundRain){
+      foundRisk=true;
+      startHR.setHours(+x.time.slice(0,2),0,0,0);
+      durR=1;
+    }else if(foundRisk&&pluieRisque){
+      durR++;
+    }else if(foundRisk&&!pluieRisque){
+      foundRisk=false;
+    }
+  }
+  if(foundRain){
+    var cumS=(Math.round(cum*10)/10).toString().replace('.',',');
+    e.textContent='\uD83C\uDF27 Pluie vers '+startH.getHours()+' h \u2022 dur\u00E9e '+dur+' h \u2022 '+cumS+' mm';
+  }else if(foundRisk){
+    e.textContent='\u26A0 Risque de pluie vers '+startHR.getHours()+' h \u2022 dur\u00E9e '+durR+' h';
+  }else{
+    e.textContent='Aucune pluie prevue dans les prochaines 24 h';
   }
 }
 
@@ -164,7 +286,7 @@ function setTmpBg(t){
   else if(t>=15){bg.className='bg-cool';lvl=3}
   else{bg.className='bg-cold';lvl=4}
   if(nightMode)bg.className='night';
-  mkParts(t,lvl);
+  if(!ecoMode)mkParts(t,lvl);
 }
 
 function mkParts(t,lvl){
@@ -232,14 +354,14 @@ function dewPoint(t,h){
 }
 function humInfo(h,t){
   var cat;
-  if(h<25)cat='Air très sec';
+  if(h<25)cat='Air tr├¿s sec';
   else if(h<40)cat='Air sec';
-  else if(h<=60)cat='Humidité modérée';
+  else if(h<=60)cat='Humidit├® mod├®r├®e';
   else if(h<=75)cat='Air humide';
-  else cat='Air très humide';
+  else cat='Air tr├¿s humide';
   var e=$('vH');if(e)e.textContent=h.toFixed(0)+'%';
-  var c=$('hCat');if(c)c.textContent=' · '+cat;
-  var dw=$('hDew');if(dw)dw.textContent='Point de rosée '+dewPoint(t,h).toFixed(1).replace('.',',')+' °C';
+  var c=$('hCat');if(c)c.textContent=' ┬À '+cat;
+  var dw=$('hDew');if(dw)dw.textContent='Point de ros├®e '+dewPoint(t,h).toFixed(1).replace('.',',')+' ┬░C';
   var lm=$('hLim');if(lm)lm.style.display=(h<=21)?'block':'none';
 }
 function cpuInfo(){
@@ -248,9 +370,30 @@ function cpuInfo(){
     if(!e)return;
     if(d.error||typeof d.temperature!=='number'){e.textContent='';e.className='cpu';return;}
     var t=d.temperature;
-    if(t>=70){e.textContent=' • CPU chaud '+t+'°';e.className='cpu hot';}
-    else if(t>=60){e.textContent=' • CPU '+t+'°';e.className='cpu warn';}
-    else{e.textContent=' • CPU '+t+'°';e.className='cpu';}
+    if(t>=70){e.textContent=' ÔÇó CPU chaud '+t+'┬░';e.className='cpu hot';}
+    else if(t>=60){e.textContent=' ÔÇó CPU '+t+'┬░';e.className='cpu warn';}
+    else{e.textContent=' ÔÇó CPU '+t+'┬░';e.className='cpu';}
+  });
+}
+function baro(){
+  J('pressure',function(d){
+    var e=$('hBaro');
+    if(!e)return;
+    if(d.error||!d.ok||typeof d.hpa!=='number'){e.innerHTML='<div class="bpa">--</div><div class="bnote">Barometre indisponible</div>';return;}
+    var ac='#fff';
+    var svg={up:'<svg class="barrow" viewBox="0 0 24 24" width="20" height="20"><path d="M12 4l-7 8h4v8h6v-8h4z" fill="'+ac+'"/></svg>',down:'<svg class="barrow" viewBox="0 0 24 24" width="20" height="20"><path d="M12 20l7-8h-4V4H9v8H5z" fill="'+ac+'"/></svg>',stable:'<svg class="barrow" viewBox="0 0 24 24" width="20" height="20"><path d="M4 11h16v2H4z" fill="'+ac+'"/></svg>',na:'<svg class="barrow" viewBox="0 0 24 24" width="20" height="20"><path d="M5 12l4-4M5 12l4 4M19 12l-4-4M19 12l-4 4" stroke="'+ac+'" stroke-width="2" fill="none" stroke-linecap="round"/></svg>'};
+    var ar=svg[d.trend]||svg.na;
+    var note=d.note||'En attente d\'historique';
+    if(d.samples<4)note='Mesure en cours\u2026';
+    e.innerHTML='<div><span class="bpa">'+Math.round(d.hpa)+' hPa</span> '+ar+'</div><div class="bnote">'+note+'</div>';
+  });
+}
+function airQ(){
+  J('air_quality',function(d){
+    var e=$('hAir');if(!e)return;
+    if(d.error||!d.ok||d.aqi===null){e.style.display='none';return;}
+    var c=d.cls==='aq-good'?'#66bb6a':d.cls==='aq-moy'?'#ffd75e':d.cls==='aq-bad'?'#ff9e5e':'#ff6b6b';
+    e.innerHTML='<svg viewBox="0 0 16 12" width="12" height="9" style="vertical-align:middle"><circle cx="5" cy="4" r="2.4" fill="'+c+'"/><path d="M4.5 6.5h6a2.6 2.6 0 0 1 0 5.2h-6a3.2 3.2 0 0 1 0-6.4z" fill="'+c+'"/></svg> Air : <b>'+d.aqi+'</b> <span style="opacity:.6">'+d.level+'</span>';
   });
 }
 function upd(){
@@ -280,13 +423,28 @@ function fc(){
     }
     var h='';
     var i;
+    var dayIdx=0;
     for(i=0;i<d.hourly.length;i++){
       var x=d.hourly[i];
+      if(x.time==='00:00'&&dayIdx<d.daily.length-1)dayIdx++;
+      var day=(d.daily&&d.daily[dayIdx])||null;
+      var isN=false;
+      if(day&&day.sunrise&&day.sunset){
+        var hhH=+x.time.slice(0,2);
+        var srH=parseSun(day.sunrise).getHours();
+        var ssH=parseSun(day.sunset).getHours();
+        isN=(hhH<srH||hhH>=ssH);
+      }
       var ico=IC[x.code]||'cloud';
-      h+='<div class="fi'+(i===0?' now':'')+'"><div class="fh">'+x.time+'</div><div class="ico ico-'+ico+'"></div><div class="ft2">'+x.temp.toFixed(0)+'\u00B0</div></div>';
+      if(isN&&(ico==='sun'||ico==='part'||ico==='cloud'))ico='moon';
+      var svg=SVGICO[ico]||SVGICO.cloud;
+      var ft3='';
+      if(typeof x.uv==='number')ft3='UV '+x.uv;
+      h+='<div class="fi'+(i===0?' now':'')+'"><div class="fh">'+x.time+'</div><svg class="forecast-icon" viewBox="0 0 40 40" aria-hidden="true">'+svg+'</svg><div class="ft2">'+x.temp.toFixed(0)+'\u00B0</div><div class="ft3">'+ft3+'</div></div>';
     }
     $('fcS').innerHTML=h;
     applySun(d);
+    pluieInfo(d);
     if(d.hourly.length>0)setFx(d.hourly[0].code);
   },fcFail);
 }
@@ -327,9 +485,9 @@ function loadLocation(cb){
 }
 function updateLocUI(){
   var n=LOC?LOC.name:'';
-  var s=$('src'); if(s)s.textContent='Previsions pour '+(n||'…')+' · Open-Meteo.com';
+  var s=$('src'); if(s)s.textContent='Previsions pour '+(n||'ÔÇª')+' ┬À Open-Meteo.com';
   var b=$('locBtn');
-  if(b)b.textContent='Lieu : '+(n||'…');
+  if(b)b.textContent='Lieu : '+(n||'ÔÇª');
 }
 function locSearch(q){
   J('location_search&q='+encodeURIComponent(q),function(d){
@@ -338,7 +496,7 @@ function locSearch(q){
     d.forEach(function(r){
       var b=document.createElement('button');
       b.className='loc-res';
-      b.textContent=r.name+(r.admin2?(' — '+r.admin2):'')+(r.admin1?(', '+r.admin1):'');
+      b.textContent=r.name+(r.admin2?(' ÔÇö '+r.admin2):'')+(r.admin1?(', '+r.admin1):'');
       b.onclick=function(){
         var all=box.querySelectorAll('.loc-res'); for(var i=0;i<all.length;i++)all[i].className='loc-res';
         b.className='loc-res sel'; pendingLoc=r;
@@ -378,24 +536,53 @@ function locReset(){
 }
 function startLive(){
   if(started)return; started=true;
-  upd(); setInterval(upd,60000);
-  fc(); setInterval(fc,900000);
+  upd(); setInterval(upd,600000);
+  fc(); setInterval(fc,1800000);
 }
 
 tick();
-setInterval(tick,10000);
+setInterval(tick,60000);
+document.body.className=(nightMode?'night':'')+(ecoMode?' eco':'');
 if(isNight())setNight(true);
 cpuInfo();
-setInterval(cpuInfo,60000);
+setInterval(cpuInfo,300000);
+baro();
+setInterval(baro,60000);
+airQ();
+setInterval(airQ,300000);
 setInterval(function(){if(sunSched.t&&new Date().getTime()>=sunSched.t){doSwitch();}},60000);
 document.addEventListener('visibilitychange',function(){
   if(!document.hidden && LOC){upd();fc();cpuInfo();}
 });
 $('nightBtn').onclick=toggleNight;
+var ecoBtn=$('ecoBtn'); if(ecoBtn)ecoBtn.onclick=toggleEco;
 var lbSearch=$('locSearch'); if(lbSearch)lbSearch.onclick=function(){var q=$('locInput').value.trim(); if(q)locSearch(q);};
 var lbConfirm=$('locConfirm'); if(lbConfirm)lbConfirm.onclick=locSave;
 var locBtn=$('locBtn'); if(locBtn)locBtn.onclick=function(){pendingLoc=null;var rb=$('locResults');if(rb)rb.innerHTML='';var cf=$('locConfirm');if(cf)cf.style.display='none';showLocOverlay();};
 var lbReset=$('locReset'); if(lbReset)lbReset.onclick=locReset;
+
+/* === MASQUAGE AUTO DES BOUTONS (30 s sans interaction) === */
+var uiNavTimer=null;
+function uiNavSel(){
+  return document.querySelectorAll('.hdr-left .nav,#nightBtn,#ecoBtn');
+}
+function uiNavShow(){
+  var els=uiNavSel(),i;
+  for(i=0;i<els.length;i++){els[i].style.opacity='';els[i].style.pointerEvents='';}
+}
+function uiNavHide(){
+  var els=uiNavSel(),i;
+  for(i=0;i<els.length;i++){els[i].style.opacity='0';els[i].style.pointerEvents='none';}
+}
+function uiNavKick(){
+  if(uiNavTimer)clearTimeout(uiNavTimer);
+  uiNavShow();
+  uiNavTimer=setTimeout(uiNavHide,30000);
+}
+document.addEventListener('touchstart',uiNavKick,false);
+document.addEventListener('click',uiNavKick,false);
+uiNavKick();
+
 loadLocation(function(ok){
   if(ok){hideLocOverlay();updateLocUI();startLive();}
   else{showLocOverlay();}

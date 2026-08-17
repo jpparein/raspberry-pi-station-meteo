@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -7,6 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Meteo">
+<link rel="manifest" href="manifest.json">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -52,13 +53,13 @@ body{font-family:Helvetica,Arial,sans-serif;color:#fff;overflow:hidden;backgroun
 #litW.on{opacity:1;background:rgba(255,255,255,.2)}
 #ui{position:relative;z-index:2;height:100%;display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;-webkit-flex-direction:column;flex-direction:column;-webkit-box-align:center;-webkit-align-items:center;align-items:center;-webkit-box-pack:center;-webkit-justify-content:center;justify-content:center;padding:110px 10px 150px}
 .hdr{position:absolute;top:0;left:0;right:0;display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-align:center;-webkit-align-items:center;align-items:center;-webkit-box-pack:justify;-webkit-justify-content:space-between;justify-content:space-between;padding:10px 14px;z-index:3}
-.nav{color:#fff;text-decoration:none;font-size:14px;padding:6px 12px;border-radius:12px;background:rgba(255,255,255,.2)}
+.nav{color:#fff;text-decoration:none;font-size:14px;padding:6px 12px;border-radius:12px;background:rgba(255,255,255,.2);display:-webkit-inline-box;display:-webkit-inline-flex;display:inline-flex;-webkit-box-align:center;-webkit-align-items:center;align-items:center;-webkit-box-pack:start;-webkit-justify-content:flex-start;justify-content:flex-start;text-align:left;white-space:nowrap}
 .dt{position:absolute;left:50%;top:4px;-webkit-transform:translateX(-50%);transform:translateX(-50%);text-align:center;pointer-events:none}
 .dt-day{font-size:14px;letter-spacing:3px;text-transform:uppercase;opacity:.6}
 .dt-time{font-size:34px;font-weight:300;line-height:1.05;text-shadow:0 1px 6px rgba(0,0,0,.15)}
 .dt-date{font-size:14px;opacity:.6}
 .dt-saint{font-size:14px;opacity:.8;margin-top:2px;font-style:italic}
-.pill{display:-webkit-inline-box;display:-webkit-inline-flex;display:inline-flex;-webkit-box-align:center;-webkit-align-items:center;align-items:center;padding:4px 10px;border-radius:14px;background:rgba(255,255,255,.2);font-size:12px}
+.pill{display:-webkit-inline-box;display:-webkit-inline-flex;display:inline-flex;-webkit-box-align:center;-webkit-align-items:center;align-items:center;padding:4px 10px;border-radius:14px;background:rgba(255,255,255,.2);font-size:12px;-webkit-align-self:flex-start;align-self:flex-start;margin-top:10px}
 .dot{width:6px;height:6px;border-radius:50%;background:#e74c3c;margin-right:7px}
 .dot.ok{background:#2ecc71}
 .hero{text-align:center}
@@ -67,6 +68,11 @@ body{font-family:Helvetica,Arial,sans-serif;color:#fff;overflow:hidden;backgroun
 .u{font-size:2.2rem;vertical-align:top;opacity:.8}
 .sub{font-size:12px;opacity:.5;margin-top:4px}
 .hum{margin:6px 0;padding:5px 14px;border-radius:14px;background:rgba(255,255,255,.2);font-size:13px;opacity:.8}
+.baro{margin:6px 0;padding:5px 14px;border-radius:14px;background:rgba(255,255,255,.2);font-size:13px;opacity:.8;text-align:center;line-height:1.6}
+.baro .bpa{font-size:1.1rem;font-weight:600}
+.baro .barrow{vertical-align:middle;margin-left:4px}
+.baro .bnote{font-size:.72rem;opacity:.65}
+body.night .baro{background:rgba(20,30,50,.5);color:#5a7a8a}
 .btn{margin:4px 0;padding:11px 24px;border:none;border-radius:12px;font-size:14px;font-weight:600;color:#fff;background:rgba(255,255,255,.22);cursor:pointer}
 .btn.ld{opacity:.5}
 .fc{position:absolute;bottom:20px;left:0;right:0;z-index:3}
@@ -76,19 +82,18 @@ body{font-family:Helvetica,Arial,sans-serif;color:#fff;overflow:hidden;backgroun
 .fi.now{background:rgba(255,255,255,.3)}
 .fh{font-size:13px;opacity:.6;margin-bottom:4px}
 .ft2{font-size:16px;font-weight:600}
+.ft3{font-size:9px;opacity:.7;margin-top:2px;white-space:nowrap}
 .src{position:absolute;bottom:3px;left:0;right:0;text-align:center;font-size:10px;opacity:.4;padding:2px 0}
 .ftr{display:none}
 @media(min-width:768px){.val{font-size:11rem}}
-.ico{width:28px;height:28px;margin:0 auto 4px;position:relative}
-.ico-sun{background:radial-gradient(circle,#fff9c4,#ffb300);border-radius:50%;box-shadow:0 0 6px #ffb300}
-.ico-part{background:radial-gradient(circle,#fff9c4,#ffb300);border-radius:50%;box-shadow:0 0 4px #ffb300;position:absolute;top:2px;left:1px;width:14px;height:14px}
-.ico-part::after{content:'';position:absolute;bottom:-2px;right:-6px;width:16px;height:10px;background:rgba(200,210,220,.85);border-radius:8px}
-.ico-cloud{background:rgba(200,210,220,.85);border-radius:10px;width:18px;height:10px;margin-top:5px}
-.ico-rain{background:rgba(140,170,200,.8);border-radius:8px;width:16px;height:8px;margin-top:4px}
-.ico-rain::after{content:'';position:absolute;bottom:-6px;left:3px;width:2px;height:4px;background:rgba(140,170,200,.7);border-radius:1px;box-shadow:5px 0 0 rgba(140,170,200,.7)}
-.ico-snow{background:rgba(200,210,220,.7);border-radius:8px;width:16px;height:8px;margin-top:4px}
-.ico-storm{background:rgba(80,90,100,.8);border-radius:8px;width:16px;height:8px;margin-top:4px}
-.ico-storm::after{content:'!';position:absolute;bottom:-8px;left:6px;font-size:8px;color:#ff0;font-weight:700}
+.forecast-icon{width:34px;height:34px;margin:0 auto 4px;display:block}
+.f-sun{fill:#ffd54f}
+.f-cloud{fill:#cdd8e0}
+.f-moon{fill:#e6ecf1}
+.f-rain{stroke:#7fa7cc}
+.f-snow{fill:#eef3f8}
+.f-bolt{stroke:#ffd54f}
+.f-fog{fill:#b9c6d2;opacity:.9}
 
 /* === MODE NUIT === */
 body.night #bg{-webkit-transition:background 1.5s;transition:background 1.5s}
@@ -96,13 +101,13 @@ body.night #bg{background:#000!important}
 body.night #sunW.on{opacity:.16}
 body.night .sunG{animation:none;opacity:0}
 body.night .sunC{box-shadow:0 0 24px 6px rgba(255,183,0,.1)}
-body.night .ico-sun{background:radial-gradient(circle,#cdd4db,#9aa2ab);box-shadow:0 0 4px rgba(150,160,170,.35)}
-body.night .ico-part{background:radial-gradient(circle,#cdd4db,#9aa2ab);box-shadow:0 0 3px rgba(150,160,170,.3)}
-body.night .ico-cloud{background:rgba(150,160,172,.55)}
-body.night .ico-rain{background:rgba(120,140,165,.6)}
-body.night .ico-snow{background:rgba(170,180,190,.5)}
-body.night .ico-storm{background:rgba(60,70,82,.7)}
-body.night .ico-storm::after{color:#cdd4db}
+body.night .f-sun{fill:#9aa2ab}
+body.night .f-cloud{fill:#8492a2}
+body.night .f-moon{fill:#b6c2cd}
+body.night .f-rain{stroke:#61788e}
+body.night .f-snow{fill:#96a4b3}
+body.night .f-bolt{stroke:#ccd4dc}
+body.night .f-fog{fill:#7c8a99}
 body.night .lbl{color:#9aa7b4}
 body.night .val{color:#eef2f6;text-shadow:0 2px 10px rgba(0,0,0,.45)}
 body.night .u{color:#cdd6df}
@@ -119,6 +124,7 @@ body.night .fi{background:rgba(20,30,50,.4)}
 body.night .fi.now{background:rgba(20,30,50,.6)}
 body.night .fh{color:#8a97a6}
 body.night .ft2{color:#b3c2d1}
+body.night .ft3{color:#7a8a99}
 body.night .src{color:#3a4a5a}
 body.night .cld{background:rgba(30,40,60,.15)}
 body.night .drop{background:rgba(80,100,130,.4)}
@@ -127,6 +133,15 @@ body.night .fl{background:rgba(150,170,200,.6)}
 /* Toggle nuit */
 .night-toggle{position:absolute;right:14px;top:54px;z-index:5;width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,.15);color:#fff;font-size:20px;cursor:pointer;line-height:44px;text-align:center}
 body.night .night-toggle{background:rgba(100,120,150,.3);color:#8aa0b0}
+.eco-toggle{top:104px}
+.hdr-left{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;-webkit-flex-direction:column;flex-direction:column;-webkit-box-align:start;-webkit-align-items:flex-start;align-items:flex-start;margin-top:10px}
+.hdr-left .nav{width:140px;margin-bottom:14px}
+.nav,.night-toggle{-webkit-transition:opacity 1s ease;transition:opacity 1s ease}
+.navico{margin-right:4px}
+body.eco .pt,body.eco .cld,body.eco .drop,body.eco .fl{opacity:0!important;-webkit-animation:none;animation:none}
+body.eco #cldW,body.eco #rainW,body.eco #snowW,body.eco #litW{opacity:0!important}
+body.eco .sunG{animation:none}
+body.night .eco-toggle{background:rgba(100,120,150,.3);color:#8aa0b0}
 .nsched{font-size:.8rem;opacity:.62;margin:2px 0 6px;text-align:center;min-height:1rem;margin-top:auto}
 body.night .nsched{color:#9aa7b4}
 .hdew{font-size:.72rem;opacity:.55;margin-top:5px;text-align:center}
@@ -165,7 +180,13 @@ body.night .locico{background:rgba(100,120,150,.3);color:#8aa0b0}
 </div>
 <div id="ui">
   <div class="hdr">
-    <a href="charts.html?v=2" class="nav"><svg class="navico" viewBox="0 0 16 12" aria-hidden="true"><rect x="1" y="7" width="3" height="5"/><rect x="6" y="4" width="3" height="8"/><rect x="11" y="1" width="3" height="11"/></svg> Stats</a>
+    <div class="hdr-left">
+      <a href="charts.html" target="_self" class="nav"><svg class="navico" viewBox="0 0 16 12" aria-hidden="true"><rect x="1" y="7" width="3" height="5"/><rect x="6" y="4" width="3" height="8"/><rect x="11" y="1" width="3" height="11"/></svg> Stats</a>
+      <a href="previsions.html" target="_self" class="nav"><svg class="navico" viewBox="0 0 16 12" aria-hidden="true"><circle cx="5" cy="4" r="2.4" fill="currentColor"/><path d="M4.5 6.5h6a2.6 2.6 0 0 1 0 5.2h-6a3.2 3.2 0 0 1 0-6.4z"/><rect x="9.5" y="3" width="1.8" height="1.8" rx=".5"/></svg> Previsions</a>
+      <a href="soleil.html" target="_self" class="nav"><svg class="navico" viewBox="0 0 16 12" aria-hidden="true"><circle cx="8" cy="4.5" r="2.3" fill="currentColor"/><g stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><line x1="8" y1="0" x2="8" y2="1.4"/><line x1="3" y1="3" x2="4" y2="4"/><line x1="13" y1="3" x2="12" y2="4"/><line x1="8" y1="9" x2="8" y2="10.4"/></g></svg> Soleil</a>
+      <a href="air-pollens.html" target="_self" class="nav"><svg class="navico" viewBox="0 0 16 12" aria-hidden="true"><circle cx="5" cy="4" r="2.4" fill="currentColor"/><path d="M4.5 6.5h6a2.6 2.6 0 0 1 0 5.2h-6a3.2 3.2 0 0 1 0-6.4z"/></svg> Air et pollens</a>
+      <a href="barometre.html" target="_self" class="nav"><svg class="navico" viewBox="0 0 16 12" aria-hidden="true"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 3v5l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Barometre</a>
+    </div>
     <div class="dt">
       <div class="dt-day" id="tDay">--</div>
       <div class="dt-time" id="tTime">--:--</div>
@@ -179,19 +200,22 @@ body.night .locico{background:rgba(100,120,150,.3);color:#8aa0b0}
     <div class="val" id="vT">--<span class="u">&deg;</span></div>
     <div class="sub" id="vTm">--</div>
   </div>
-  <div class="hum">Humidité <span id="vH">--%</span><span id="hCat"></span></div>
+  <div class="hum">Humidit├® <span id="vH">--%</span><span id="hCat"></span></div>
   <div class="hdew" id="hDew"></div>
   <div class="hlim" id="hLim" style="display:none"></div>
+  <div class="baro" id="hBaro"></div>
+  <div class="hdew" id="hAir"></div>
   <button class="btn" id="btnL">&#9889; Mesurer</button>
   <div class="nsched" id="nsched"></div>
   <div class="fc"><div class="fs" id="fcS"></div></div>
   <div class="src" id="src">Previsions : Open-Meteo.com</div>
   <div class="locrow">
-    <button class="locbtn" id="locBtn">Lieu : …</button>
+    <button class="locbtn" id="locBtn">Lieu : ÔÇª</button>
     <button class="locico" id="locReset" title="Reinitialiser la commune" aria-label="Reinitialiser la commune"><svg class="ric" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
   </div>
 </div>
 <button class="night-toggle" id="nightBtn" title="Mode nuit">&#9790;</button>
+<button class="night-toggle eco-toggle" id="ecoBtn" title="Economie d'energie"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg></button>
 
 <div class="loc-overlay" id="locOverlay">
   <h2>Configurer les previsions meteo</h2>
@@ -201,6 +225,6 @@ body.night .locico{background:rgba(100,120,150,.3);color:#8aa0b0}
   <button class="loc-btn" id="locConfirm" style="display:none">Utiliser cette localisation</button>
 </div>
 
-<script src="app.js?v=18"></script>
+<script src="app.js?v=20"></script>
 </body>
 </html>

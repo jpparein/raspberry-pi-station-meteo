@@ -1,0 +1,253 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Meteo">
+<link rel="manifest" href="manifest.json">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Barometre - Station Meteo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:Helvetica,Arial,sans-serif;color:#fff;overflow:hidden;background:#333}
+#bg{position:fixed;top:0;left:0;right:0;bottom:0;z-index:0;-webkit-transition:background 1.5s;transition:background 1.5s}
+.bg-day{background:linear-gradient(180deg,#42a5f5 0%,#64b5f6 60%,#cfe6f8 100%)}
+#shade{position:fixed;top:0;left:0;right:0;bottom:0;z-index:1;background:linear-gradient(180deg,rgba(0,0,0,.32) 0%,rgba(0,0,0,.22) 45%,rgba(0,0,0,.38) 100%);pointer-events:none}
+#wrap{position:relative;z-index:2;height:100%;display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;-webkit-flex-direction:column;flex-direction:column;padding:64px 10px 12px}
+.hdr{position:absolute;top:0;left:0;right:0;display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-align:center;-webkit-align-items:center;align-items:center;-webkit-box-pack:justify;-webkit-justify-content:space-between;justify-content:space-between;padding:14px 14px 0;z-index:3}
+.nav{color:#fff;text-decoration:none;font-size:14px;padding:6px 12px;border-radius:12px;background:rgba(255,255,255,.2)}
+.ttl{font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-align:center}
+.nt{width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,.15);color:#fff;font-size:20px;cursor:pointer;line-height:44px;text-align:center}
+#box{-webkit-box-flex:1;-webkit-flex:1;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;text-align:center;padding:2px 4px 12px}
+#msg{padding:20px;text-align:center;font-size:14px;opacity:.8}
+
+.hero{margin:8px auto;max-width:400px;background:rgba(20,30,50,.38);border-radius:20px;padding:20px 16px;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.hero .hl{font-size:11px;letter-spacing:1px;text-transform:uppercase;opacity:.8}
+.hero .hv{font-size:3.6rem;font-weight:100;line-height:1.05;margin:4px 0}
+.hero .hu{font-size:1.2rem;font-weight:400;opacity:.7}
+.hero .hr{margin:4px 0}
+.hero .hr svg{vertical-align:middle}
+.hero .hf{font-size:13px;opacity:.7;margin-top:4px}
+
+.grid{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-flex-wrap:wrap;flex-wrap:wrap;-webkit-box-pack:center;-webkit-justify-content:center;justify-content:center;gap:8px;max-width:420px;margin:8px auto 0}
+.cell{background:rgba(20,30,50,.38);border-radius:14px;padding:10px 12px;width:124px;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.cell .cl{font-size:10px;letter-spacing:1px;text-transform:uppercase;opacity:.8}
+.cell .cv{font-size:18px;font-weight:600;margin-top:3px}
+.cell .cv.up{color:#66bb6a}
+.cell .cv.down{color:#ef5350}
+.cell .cv.stable{color:#90a4ae}
+
+.sec{margin:12px auto 2px;max-width:420px;font-size:11px;letter-spacing:1px;text-transform:uppercase;opacity:.8;text-align:left;padding:0 6px;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+canvas{display:block;width:100%;max-width:400px;margin:6px auto;border-radius:14px;background:rgba(20,30,50,.38)}
+
+.forecast{margin:8px auto;max-width:420px;background:rgba(20,30,50,.38);border-radius:16px;padding:14px 16px;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.forecast .fl{font-size:11px;letter-spacing:1px;text-transform:uppercase;opacity:.8;margin-bottom:6px}
+.forecast .fi{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-align:center;-webkit-align-items:center;align-items:center;gap:10px}
+.forecast .fic{width:40px;height:40px;border-radius:50%;display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-align:center;-webkit-align-items:center;align-items:center;-webkit-box-pack:center;-webkit-justify-content:center;justify-content:center;-webkit-flex-shrink:0;flex-shrink:0}
+.forecast .ft{font-size:15px;font-weight:600}
+.forecast .fd{font-size:12px;opacity:.7;margin-top:2px}
+
+.cbar{margin:8px auto;max-width:420px;background:rgba(20,30,50,.38);border-radius:14px;padding:10px 14px;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.cbar .cl{font-size:10px;letter-spacing:1px;text-transform:uppercase;opacity:.8;margin-bottom:6px}
+.cbar .bar{position:relative;height:8px;border-radius:4px;background:rgba(255,255,255,.12);overflow:visible}
+.cbar .bar .fill{position:absolute;top:0;left:0;height:100%;border-radius:4px;-webkit-transition:width .5s;transition:width .5s}
+.cbar .bar .marker{position:absolute;top:-4px;width:16px;height:16px;border-radius:50%;border:2px solid #fff;-webkit-transform:translateX(-50%);transform:translateX(-50%);z-index:2}
+.cbar .labels{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-justify-content:space-between;justify-content:space-between;font-size:11px;opacity:.7;margin-top:6px}
+
+body.night #bg{background:#000!important}
+body.night .nav{background:rgba(20,30,50,.5);color:#5a7a8a}
+body.night .nt{background:rgba(100,120,150,.3);color:#8aa0b0}
+body.night .ttl{color:#eef2f6}
+body.night .hero{background:rgba(20,30,50,.55);color:#c6d2dd}
+body.night .cell{background:rgba(20,30,50,.55);color:#c6d2dd}
+body.night .forecast{background:rgba(20,30,50,.55);color:#c6d2dd}
+body.night .cbar{background:rgba(20,30,50,.55);color:#c6d2dd}
+body.night .sec{color:#8aa0b0}
+</style>
+</head>
+<body>
+<div id="bg" class="bg-day"></div>
+<div id="shade"></div>
+<div id="wrap">
+  <div class="hdr">
+    <a href="index.html" target="_self" class="nav">&#8592; Retour</a>
+    <div class="ttl">Barometre</div>
+    <button class="nt" id="nightBtn" title="Mode nuit">&#9790;</button>
+  </div>
+  <div id="box"><div id="msg">Chargement...</div></div>
+</div>
+<script>
+var API='api.php';
+var nightMode=false;
+function $(i){return document.getElementById(i)}
+function J(u,cb,eb){
+  var x=new XMLHttpRequest();
+  x.open('GET',API+'?action='+u,true);
+  x.onload=function(){try{cb(JSON.parse(x.responseText))}catch(e){if(eb)eb()}};
+  x.onerror=function(){if(eb)eb()};
+  x.send();
+}
+function isNight(){var h=new Date().getHours();return h>=21||h<7;}
+function setNight(on){
+  nightMode=on;
+  document.body.className=on?'night':'';
+  var b=$('nightBtn');if(b)b.textContent=on?'\u2600':'\u263E';
+}
+function pad(x){return (x<10?'0':'')+x;}
+function tstamp(ts){
+  var d=new Date(ts*1000);
+  return pad(d.getHours())+':'+pad(d.getMinutes());
+}
+function arrowSvg(trend,color){
+  if(trend==='up')return '<svg viewBox="0 0 24 24" width="28" height="28"><path d="M12 4l-7 8h4v8h6v-8h4z" fill="'+color+'"/></svg>';
+  if(trend==='down')return '<svg viewBox="0 0 24 24" width="28" height="28"><path d="M12 20l7-8h-4V4H9v8H5z" fill="'+color+'"/></svg>';
+  if(trend==='stable')return '<svg viewBox="0 0 24 24" width="28" height="28"><path d="M4 11h16v2H4z" fill="'+color+'"/></svg>';
+  return '<svg viewBox="0 0 24 24" width="28" height="28"><path d="M5 12l4-4M5 12l4 4M19 12l-4-4M19 12l-4 4" stroke="'+color+'" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
+}
+function fcColor(trend){
+  if(trend==='up')return '#66bb6a';
+  if(trend==='down')return '#ef5350';
+  return '#90a4ae';
+}
+function forecastInfo(fc){
+  var map={
+    orage:{c:'#ff7043',icon:'\u26A1',t:'Risque d\'orage',d:'Chute de pression rapide, instabilite atmospherique.'},
+    pluie:{c:'#42a5f5',icon:'\u{1F327}',t:'Pluie probable',d:'Pression en baisse, humidite en hausse.'},
+    degage:{c:'#66bb6a',icon:'\u2600',t:'Deganement probable',d:'Pression en hausse, ciel en amelioration.'},
+    degradation:{c:'#ffa726',icon:'\u2601',t:'Degradation possible',d:'Pression leggerement en baisse.'},
+    stabilite:{c:'#78909c',icon:'\u2601',t:'Stabilite',d:'Pas de changement significatif prevu.'}
+  };
+  return map[fc]||map.stabilite;
+}
+function drawGraph(hist){
+  var canvas=$('graph');
+  if(!canvas||!hist||hist.length<2)return;
+  var dpr=window.devicePixelRatio||1;
+  var w=canvas.clientWidth;
+  var h=120;
+  canvas.width=w*dpr;
+  canvas.height=h*dpr;
+  canvas.style.height=h+'px';
+  var ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  var vals=[];
+  var ts=[];
+  for(var i=0;i<hist.length;i++){vals.push(hist[i].h);ts.push(hist[i].t);}
+  var mn=Math.min.apply(null,vals);
+  var mx=Math.max.apply(null,vals);
+  var range=mx-mn;
+  if(range<1){mn-=0.5;mx+=0.5;range=1;}
+  mn-=range*0.1;
+  mx+=range*0.1;
+  range=mx-mn;
+  var padY=14;
+  var padX=30;
+  var gw=w-padX*2;
+  var gh=h-padY*2;
+  ctx.clearRect(0,0,w,h);
+  ctx.strokeStyle='rgba(255,255,255,.12)';
+  ctx.lineWidth=1;
+  for(var i=0;i<5;i++){
+    var y=padY+gh*(i/4);
+    ctx.beginPath();ctx.moveTo(padX,y);ctx.lineTo(w-padX,y);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.4)';
+    ctx.font='9px Helvetica';
+    ctx.textAlign='right';
+    ctx.fillText((mx-range*(i/4)).toFixed(0),padX-4,y+3);
+  }
+  var grad=ctx.createLinearGradient(0,padY,0,h-padY);
+  grad.addColorStop(0,'rgba(102,187,106,.45)');
+  grad.addColorStop(0.5,'rgba(255,255,255,.15)');
+  grad.addColorStop(1,'rgba(239,83,80,.45)');
+  ctx.beginPath();
+  for(var i=0;i<vals.length;i++){
+    var x=padX+(i/(vals.length-1))*gw;
+    var y=padY+((mx-vals[i])/range)*gh;
+    if(i===0)ctx.moveTo(x,y);
+    else ctx.lineTo(x,y);
+  }
+  ctx.lineTo(padX+gw,h-padY);
+  ctx.lineTo(padX,h-padY);
+  ctx.closePath();
+  ctx.fillStyle=grad;
+  ctx.fill();
+  ctx.beginPath();
+  for(var i=0;i<vals.length;i++){
+    var x=padX+(i/(vals.length-1))*gw;
+    var y=padY+((mx-vals[i])/range)*gh;
+    if(i===0)ctx.moveTo(x,y);
+    else ctx.lineTo(x,y);
+  }
+  ctx.strokeStyle='rgba(255,255,255,.8)';
+  ctx.lineWidth=1.5;
+  ctx.stroke();
+  var last=vals.length-1;
+  var lx=padX+gw;
+  var ly=padY+((mx-vals[last])/range)*gh;
+  ctx.beginPath();ctx.arc(lx,ly,3.5,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
+  var nlabel=6;
+  if(ts.length>=nlabel){
+    ctx.fillStyle='rgba(255,255,255,.45)';
+    ctx.font='9px Helvetica';
+    ctx.textAlign='center';
+    var step=Math.floor(ts.length/nlabel);
+    for(var i=0;i<nlabel;i++){
+      var idx=Math.min(i*step+step,ts.length-1);
+      var x=padX+(idx/(vals.length-1))*gw;
+      ctx.fillText(tstamp(ts[idx]),x,h-2);
+    }
+  }
+}
+function render(d){
+  var box=$('msg');
+  if(d.error||!d.ok){box.innerHTML='<div style="padding:20px;opacity:.6">Barometre indisponible</div>';return;}
+  var ac=fcColor(d.trend);
+  var html='';
+  html+='<div class="hero">';
+  html+='<div class="hl">Pression atmospherique</div>';
+  html+='<div class="hv">'+Math.round(d.hpa)+'<span class="hu"> hPa</span></div>';
+  html+='<div class="hr">'+arrowSvg(d.trend,ac)+' <span style="font-size:13px;opacity:.8">'+d.note+'</span></div>';
+  html+='<div class="hf">Temperature sonde : '+d.temp+' \u00B0C</div>';
+  html+='</div>';
+  html+='<div class="grid">';
+  html+='<div class="cell"><div class="cl">Delta 1h</div><div class="cv '+(d.delta1h>0?'up':d.delta1h<0?'down':'stable')+'">'+(d.delta1h>0?'+':'')+d.delta1h+' hPa</div></div>';
+  html+='<div class="cell"><div class="cl">Delta 3h</div><div class="cv '+(d.delta>0?'up':d.delta<0?'down':'stable')+'">'+(d.delta>0?'+':'')+d.delta+' hPa</div></div>';
+  html+='<div class="cell"><div class="cl">Delta 24h</div><div class="cv '+(d.delta24h>0?'up':d.delta24h<0?'down':'stable')+'">'+(d.delta24h>0?'+':'')+d.delta24h+' hPa</div></div>';
+  html+='<div class="cell"><div class="cl">Min 24h</div><div class="cv down">'+d.min24+' hPa</div></div>';
+  html+='<div class="cell"><div class="cl">Max 24h</div><div class="cv up">'+d.max24+' hPa</div></div>';
+  html+='<div class="cell"><div class="cl">Ecart 1013</div><div class="cv '+(d.hpa>=1013.25?'up':'down')+'">'+(d.hpa>=1013.25?'+':'')+(d.hpa-1013.25).toFixed(1)+' hPa</div></div>';
+  html+='</div>';
+  var fc=forecastInfo(d.forecast);
+  html+='<div class="forecast"><div class="fl">Prevision basee sur la pression</div>';
+  html+='<div class="fi"><div class="fic" style="background:'+fc.c+';font-size:20px">'+fc.icon+'</div><div><div class="ft">'+fc.t+'</div><div class="fd">'+fc.d+'</div></div></div></div>';
+  var range=d.max24-d.min24;
+  var pos=range>0?((d.hpa-d.min24)/range)*100:50;
+  html+='<div class="sec">Position dans l\'intervalle 24h</div>';
+  html+='<div class="cbar"><div class="cl">'+d.min24+' hPa \u2014 '+d.max24+' hPa</div>';
+  html+='<div class="bar"><div class="fill" style="width:100%;background:linear-gradient(90deg,#ef5350,#fff 50%,#66bb6a)"></div>';
+  html+='<div class="marker" style="left:'+pos+'%;background:'+ac+'"></div></div>';
+  html+='<div class="labels"><span>'+d.min24+'</span><span>'+d.hpa+' hPa</span><span>'+d.max24+'</span></div></div>';
+  html+='<div class="sec">Evolution 24h</div>';
+  html+='<canvas id="graph"></div>';
+  html+='<div style="text-align:center;font-size:10px;opacity:.4;margin-top:8px">'+d.samples+' echantillons \u00B7 MAJ toutes les min</div>';
+  box.innerHTML=html;
+  if(d.history)drawGraph(d.history);
+}
+function load(){J('pressure',render,function(){$('msg').innerHTML='<div style="padding:20px;opacity:.6">Erreur de chargement</div>';});}
+function init(){
+  setNight(isNight());
+  load();
+  setInterval(load,60000);
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
+else init();
+$('nightBtn').onclick=function(){setNight(!nightMode);};
+</script>
+</body>
+</html>

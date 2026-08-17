@@ -1,0 +1,217 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Meteo">
+<link rel="manifest" href="manifest.json">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Air et pollens - Station Meteo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:Helvetica,Arial,sans-serif;color:#fff;overflow:hidden;background:#333}
+#bg{position:fixed;top:0;left:0;right:0;bottom:0;z-index:0;-webkit-transition:background 1.5s;transition:background 1.5s}
+.bg-day{background:linear-gradient(180deg,#42a5f5 0%,#64b5f6 60%,#cfe6f8 100%)}
+#shade{position:fixed;top:0;left:0;right:0;bottom:0;z-index:1;background:linear-gradient(180deg,rgba(0,0,0,.32) 0%,rgba(0,0,0,.22) 45%,rgba(0,0,0,.38) 100%);pointer-events:none}
+#wrap{position:relative;z-index:2;height:100%;display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;-webkit-flex-direction:column;flex-direction:column;padding:64px 10px 12px}
+.hdr{position:absolute;top:0;left:0;right:0;display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-align:center;-webkit-align-items:center;align-items:center;-webkit-box-pack:justify;-webkit-justify-content:space-between;justify-content:space-between;padding:14px 14px 0;z-index:3}
+.nav{color:#fff;text-decoration:none;font-size:14px;padding:6px 12px;border-radius:12px;background:rgba(255,255,255,.2)}
+.ttl{font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-align:center}
+.nt{width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,.15);color:#fff;font-size:20px;cursor:pointer;line-height:44px;text-align:center}
+#box{-webkit-box-flex:1;-webkit-flex:1;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;text-align:center;padding:2px 4px 12px}
+.datecard{display:inline-block;background:rgba(0,0,0,.28);border-radius:14px;padding:8px 16px;font-size:14px;font-weight:600;letter-spacing:.5px;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.datecard .dj{font-size:11px;letter-spacing:1px;opacity:.8;text-transform:uppercase}
+.aqi{background:rgba(20,30,50,.38);border-radius:16px;margin:8px auto 0;max-width:400px;padding:14px 16px;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.aqi .al{font-size:11px;letter-spacing:1px;text-transform:uppercase;opacity:.8}
+.aqi .av{font-size:44px;font-weight:600;line-height:1.1;margin-top:2px}
+.aqi .an{display:inline-block;font-size:14px;font-weight:700;border-radius:14px;padding:4px 14px;margin-top:4px}
+.grid{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-flex-wrap:wrap;flex-wrap:wrap;-webkit-box-pack:center;-webkit-justify-content:center;justify-content:center;gap:8px;max-width:420px;margin:8px auto 0}
+.cell{background:rgba(20,30,50,.38);border-radius:14px;padding:10px 12px;width:164px;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.cell .cl{font-size:10px;letter-spacing:1px;text-transform:uppercase;opacity:.8}
+.cell .cl .hl{opacity:.55;font-size:9px}
+.cell .cv{font-size:20px;font-weight:600;margin-top:3px}
+.cell .cv.na{opacity:.55;font-size:14px;font-style:italic}
+.sec{margin:12px auto 2px;max-width:420px;font-size:11px;letter-spacing:1px;text-transform:uppercase;opacity:.8;text-align:left;padding:0 6px;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.hrow{display:-webkit-box;display:-webkit-flex;display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:4px 2px;max-width:420px;margin:0 auto}
+.hrow::-webkit-scrollbar{display:none}
+.hc{-webkit-flex:0 0 auto;flex:0 0 auto;width:58px;text-align:center;background:rgba(20,30,50,.35);border-radius:12px;padding:6px 2px;margin-right:6px}
+.hc .hh{font-size:10px;opacity:.75;margin-bottom:3px}
+.hc .hv{font-size:14px;font-weight:700}
+.hc .aiq{font-size:8px;opacity:.7;margin-top:2px}
+.advice{margin:10px auto 0;max-width:420px;background:rgba(20,30,50,.38);border-radius:14px;padding:11px 14px;font-size:13px;line-height:1.45;text-align:left;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.advice .at{font-size:10px;letter-spacing:1px;text-transform:uppercase;opacity:.8;margin-bottom:3px}
+#msg{padding:20px;text-align:center;font-size:14px;opacity:.8}
+.aq-good{color:#8bd9a0}
+.aq-moy{color:#ffd75e}
+.aq-bad{color:#ff9e5e}
+.aq-very{color:#ff6b6b}
+body.night #bg{background:#000!important}
+body.night .nav{background:rgba(20,30,50,.5);color:#5a7a8a}
+body.night .nt{background:rgba(100,120,150,.3);color:#8aa0b0}
+body.night .ttl{color:#eef2f6}
+body.night .aqi{background:rgba(20,30,50,.55);color:#c6d2dd}
+body.night .cell{background:rgba(20,30,50,.55);color:#c6d2dd}
+body.night .hc{background:rgba(20,30,50,.55);color:#c6d2dd}
+body.night .advice{background:rgba(20,30,50,.55);color:#c6d2dd}
+body.night .datecard{background:rgba(20,30,50,.55);color:#c6d2dd}
+body.night .sec{color:#8aa0b0}
+</style>
+</head>
+<body>
+<div id="bg" class="bg-day"></div>
+<div id="shade"></div>
+<div id="wrap">
+  <div class="hdr">
+    <a href="index.html" target="_self" class="nav">&#8592; Retour</a>
+    <div class="ttl">Air et pollens</div>
+    <button class="nt" id="nightBtn" title="Mode nuit">&#9790;</button>
+  </div>
+  <div id="box"><div style="padding:16px;text-align:center;opacity:.6">Chargement...</div></div>
+</div>
+<script>
+var API='api.php';
+var nightMode=false;
+function $(i){return document.getElementById(i)}
+function J(u,cb,eb){
+  var x=new XMLHttpRequest();
+  x.open('GET',API+'?action='+u,true);
+  x.onload=function(){try{cb(JSON.parse(x.responseText))}catch(e){if(eb)eb()}};
+  x.onerror=function(){if(eb)eb()};
+  x.send();
+}
+function isNight(){var h=new Date().getHours();return h>=21||h<7;}
+function setNight(on){
+  nightMode=on;
+  document.body.className=on?'night':'';
+  var b=$('nightBtn');if(b)b.textContent=on?'\u2600':'\u263E';
+}
+function pad(x){return (x<10?'0':'')+x;}
+function na(){return 'Donnee indisponible';}
+function fmt1(v){
+  if(typeof v!=='number')return na();
+  var s=(Math.round(v*10)/10).toString().replace('.',',');
+  if(s.indexOf(',')<0)s=s+',0';
+  return s;
+}
+function fmtV(v,dec){
+  if(typeof v!=='number')return na();
+  return (Math.round(v*(dec?10:1))/(dec?10:1)).toString().replace('.',',');
+}
+function dname(y,m,d){
+  var dt=new Date(y,m-1,d,12,0,0);
+  var J=['DIMANCHE','LUNDI','MARDI','MERCREDI','JEUDI','VENDREDI','SAMEDI'];
+  var M=['JANVIER','FEVRIER','MARS','AVRIL','MAI','JUIN','JUILLET','AOUT','SEPTEMBRE','OCTOBRE','NOVEMBRE','DECEMBRE'];
+  return {j:J[dt.getDay()],m:M[dt.getMonth()]};
+}
+function aqLevel(v){
+  if(v<20)return {c:'aq-good',n:'Bon'};
+  if(v<40)return {c:'aq-moy',n:'Moyen'};
+  if(v<60)return {c:'aq-bad',n:'Mauvais'};
+  return {c:'aq-very',n:'Tres mauvais'};
+}
+function conseil(aqi,pollens){
+  var c=[];
+  if(aqi>=60)c.push('Air tres defaillant : evitez autant que possible les activites en exterieur.');
+  else if(aqi>=40)c.push('Air degrade : limitez les efforts prolonges en exterieur.');
+  else if(aqi>=20)c.push('Air moyen : personnes sensibles, moderer les efforts en exterieur.');
+  else c.push('Bel air : profitez des activites en plein air.');
+  var high=0;
+  var type='';
+  if(pollens.g>=50){high=1;type='les graminees';}
+  if(pollens.b>=50){high=1;type=type?type+' et le bouleau':'le bouleau';}
+  if(pollens.a>=50){high=1;type=type?type+' et l\'aulne':"l'aulne";}
+  if(high)c.push('Fortes emissions de pollens ('+type+') : les allergiques devront limiter l\'exposition exterieure.');
+  return c.join(' ');
+}
+function render(d){
+  var now=new Date();
+  var pr=dname(now.getFullYear(),now.getMonth()+1,now.getDate());
+  var date=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
+  var h=d.hourly;
+  var n=0;
+  var cur=null;
+  if(h&&h.time&&h.time.length){
+    var nowStr=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+'T'+pad(now.getHours())+':00';
+    for(var i=0;i<h.time.length;i++){
+      if(h.time[i]<=nowStr)cur={a:h.european_aqi[i],pm25:h.pm2_5[i],pm10:h.pm10[i],oz:h.ozone[i],g:h.grass_pollen[i],b:h.birch_pollen[i],al:h.alder_pollen[i]};
+    }
+    if(cur===null)cur={a:h.european_aqi[0],pm25:h.pm2_5[0],pm10:h.pm10[0],oz:h.ozone[0],g:h.grass_pollen[0],b:h.birch_pollen[0],al:h.alder_pollen[0]};
+  }
+  var aqi=(cur&&typeof cur.a==='number')?Math.round(cur.a):null;
+  var lvl=aqLevel(aqi===null?-1:aqi);
+  var html='';
+  html+='<div class="datecard"><div class="dj">'+pr.j+' '+pr.m.toLowerCase()+'</div><div>'+date+'</div></div>';
+  html+='<div class="aqi"><div class="al">Indice europeen de qualite de l\'air</div>';
+  html+='<div class="av">'+(aqi===null?na():aqi)+'</div>';
+  html+='<div class="an '+lvl.c+'">Niveau global : '+lvl.n+'</div></div>';
+  html+='<div class="grid">';
+  html+=cell('PM2.5','\u00B5g/m\u00B3',fmtV(cur?cur.pm25:null,1));
+  html+=cell('PM10','\u00B5g/m\u00B3',fmtV(cur?cur.pm10:null,1));
+  html+=cell('Ozone','\u00B5g/m\u00B3',fmtV(cur?cur.oz:null,1));
+  html+=cell('Pollens graminees','grains/m\u00B3',fmtV(cur?cur.g:null,0));
+  html+=cell('Pollens bouleau','grains/m\u00B3',fmtV(cur?cur.b:null,0));
+  html+=cell('Pollens aulne','grains/m\u00B3',fmtV(cur?cur.al:null,0));
+  html+='</div>';
+  html+='<div class="sec">Evolution AQI - prochaines 24 heures</div>';
+  html+='<div class="hrow">';
+  if(h&&h.time&&h.time.length){
+    var shown=0;
+    for(var k=0;k<h.time.length&&shown<24;k++){
+      if(h.time[k]<=nowStr)continue;
+      var hv=typeof h.european_aqi[k]==='number'?Math.round(h.european_aqi[k]):-1;
+      var l2=aqLevel(hv);
+      html+='<div class="hc"><div class="hh">'+h.time[k].slice(11,16)+'</div><div class="hv '+(hv<0?'':l2.c)+'">'+(hv<0?'--':hv)+'</div><div class="aiq">AQI</div></div>';
+      shown++;
+    }
+    if(shown===0){html+=hcNA();}
+  }else{html+=hcNA();}
+  html+='</div>';
+  var pollens={g:(cur&&typeof cur.g==='number')?cur.g:-1,b:(cur&&typeof cur.b==='number')?cur.b:-1,a:(cur&&typeof cur.al==='number')?cur.al:-1};
+  html+='<div class="advice"><div class="at">Conseil</div>'+conseil(aqi===null?0:aqi,pollens)+'</div>';
+  $('box').innerHTML=html;
+}
+function cell(label,unit,val){
+  var naFlag=(val===na());
+  return '<div class="cell"><div class="cl">'+label+'<br><span class="hl">'+unit+'</span></div><div class="cv'+(naFlag?' na':'')+'">'+val+'</div></div>';
+}
+function hcNA(){
+  var i,s='';
+  for(i=0;i<6;i++)s+='<div class="hc"><div class="hh">--:--</div><div class="hv">--</div><div class="aiq">AQI</div></div>';
+  return s;
+}
+function load(){
+  J('location',function(loc){
+    if(!loc||!loc.configured){
+      $('box').innerHTML='<div id="msg">Localisation non configuree. Revenir a l\'accueil pour configurer.</div>';
+      return;
+    }
+    var url='https://air-quality-api.open-meteo.com/v1/air-quality?latitude='+loc.latitude+'&longitude='+loc.longitude
+      +'&hourly=european_aqi,pm2_5,pm10,ozone,grass_pollen,birch_pollen,alder_pollen'
+      +'&timezone='+encodeURIComponent(loc.timezone||'Europe/Paris')+'&forecast_days=1';
+    var x=new XMLHttpRequest();
+    x.open('GET',url,true);
+    x.timeout=12000;
+    x.onload=function(){
+      try{
+        var d=JSON.parse(x.responseText);
+        if(d&&d.hourly&&d.hourly.time&&d.hourly.time.length){render(d);}
+        else{$('box').innerHTML='<div id="msg">Donnees qualite de l\'air indisponibles.</div>';}
+      }catch(e){$('box').innerHTML='<div id="msg">Donnees qualite de l\'air indisponibles.</div>';}
+    };
+    x.onerror=function(){$('box').innerHTML='<div id="msg">Reseau indisponible.</div>';};
+    x.ontimeout=function(){$('box').innerHTML='<div id="msg">Delai depasse.</div>';};
+    x.send();
+  },function(){$('box').innerHTML='<div id="msg">Localisation indisponible.</div>';});
+}
+setNight(isNight());
+$('nightBtn').onclick=function(){setNight(!nightMode);};
+load();
+</script>
+</body>
+</html>

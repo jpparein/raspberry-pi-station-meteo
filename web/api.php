@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 date_default_timezone_set('Europe/Paris');
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-cache, must-revalidate');
@@ -46,7 +46,7 @@ function getForecast() {
             }
         }
     }
-    $url = "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&hourly=temperature_2m,weathercode&daily=sunrise,sunset,weathercode,temperature_2m_max,temperature_2m_min&timezone=".urlencode($tz)."&forecast_days=2";
+    $url = "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&hourly=temperature_2m,weathercode,uv_index,precipitation_probability,precipitation&daily=sunrise,sunset,weathercode,temperature_2m_max,temperature_2m_min&timezone=".urlencode($tz)."&forecast_days=2";
     $ctx = stream_context_create(['http' => ['timeout' => 10]]);
     $resp = @file_get_contents($url, false, $ctx);
     if ($resp === false) return staleCache();
@@ -63,6 +63,9 @@ function getForecast() {
         $result[] = [
             'time' => $dt->format('H:00'),
             'temp' => round($data['hourly']['temperature_2m'][$i], 1),
+            'uv' => isset($data['hourly']['uv_index'][$i]) ? round($data['hourly']['uv_index'][$i]) : null,
+            'pprob' => isset($data['hourly']['precipitation_probability'][$i]) ? round($data['hourly']['precipitation_probability'][$i]) : null,
+            'pmm' => isset($data['hourly']['precipitation'][$i]) ? round($data['hourly']['precipitation'][$i], 1) : null,
             'code' => $data['hourly']['weathercode'][$i]
         ];
     }
@@ -286,6 +289,146 @@ try {
             if(file_exists($loc_file)) @unlink($loc_file);
             if(file_exists($cache_file)) @unlink($cache_file);
             echo json_encode(['ok' => true]);
+            break;
+
+        case 'pressure':
+            $pfile = '/home/rpi/meteo/data/pressure_history.json';
+            $out = trim((string)shell_exec("timeout 20 /usr/bin/python3 /home/rpi/meteo/bmp280_read.py 2>/dev/null"));
+            $j = json_decode($out, true);
+            if (!$j || empty($j['ok']) || !is_numeric($j['hpa'])) {
+                echo json_encode(['ok' => false, 'error' => 'Barometre indisponible']);
+                break;
+            }
+            $hpa = (float)$j['hpa'];
+            $hist = [];
+            if (file_exists($pfile)) {
+                $raw = json_decode(file_get_contents($pfile), true);
+                if (is_array($raw)) $hist = $raw;
+            }
+            $now = time();
+            $hist[] = ['ts' => $now, 'hpa' => round($hpa, 2)];
+            $keep = [];
+            foreach ($hist as $s) {
+                if ($s['ts'] >= $now - 86400) $keep[] = $s;
+            }
+            @file_put_contents($pfile, json_encode($keep), LOCK_EX);
+            $trend = 'na'; $delta = 0.0;
+            $refs = [];
+            foreach ($keep as $s) {
+                if ($s['ts'] >= $now - 12600 && $s['ts'] <= $now - 10200) $refs[] = (float)$s['hpa'];
+            }
+            if (count($refs) >= 2) {
+                $delta = $hpa - (array_sum($refs) / count($refs));
+                if ($delta >= 1.0) $trend = 'up';
+                elseif ($delta <= -1.0) $trend = 'down';
+                else $trend = 'stable';
+            }
+            $note = '';
+            if ($trend === 'up') $note = 'Amelioration probable';
+            elseif ($trend === 'down') $note = 'Degradation probable';
+            elseif ($trend === 'stable') $note = 'stable';
+            $hist24 = [];
+            foreach ($keep as $s) {
+                if ($s['ts'] >= $now - 86400) $hist24[] = ['t' => $s['ts'], 'h' => $s['hpa']];
+            }
+            $hpas = array_map(function($s){return $s['hpa'];}, $keep);
+            $min24 = count($hpas) ? min($hpas) : $hpa;
+            $max24 = count($hpas) ? max($hpas) : $hpa;
+            $delta1h = 0.0;
+            $refs1h = [];
+            foreach ($keep as $s) {
+                if ($s['ts'] >= $now - 4200 && $s['ts'] <= $now - 3000) $refs1h[] = (float)$s['hpa'];
+            }
+            if (count($refs1h) >= 1) $delta1h = round($hpa - (array_sum($refs1h) / count($refs1h)), 1);
+            $delta24h = 0.0;
+            $refs24 = [];
+            foreach ($keep as $s) {
+                if ($s['ts'] >= $now - 90000 && $s['ts'] <= $now - 78000) $refs24[] = (float)$s['hpa'];
+            }
+            if (count($refs24) >= 1) $delta24h = round($hpa - (array_sum($refs24) / count($refs24)), 1);
+            $forecast = 'stabilite';
+            if ($delta >= 2.0 || $delta1h >= 1.5) $forecast = 'orage';
+            elseif ($delta >= 1.0 || $delta1h >= 0.8) $forecast = 'pluie';
+            elseif ($delta <= -2.0 || $delta1h <= -1.5) $forecast = 'orage';
+            elseif ($delta <= -1.0 || $delta1h <= -0.8) $forecast = 'pluie';
+            elseif ($delta > 0.2) $forecast = 'degage';
+            elseif ($delta < -0.2) $forecast = 'degradation';
+            echo json_encode([
+                'ok' => true,
+                'hpa' => round($hpa, 1),
+                'temp' => round((float)$j['temp'], 1),
+                'trend' => $trend,
+                'delta' => round($delta, 1),
+                'delta1h' => $delta1h,
+                'delta24h' => $delta24h,
+                'note' => $note,
+                'forecast' => $forecast,
+                'min24' => round($min24, 1),
+                'max24' => round($max24, 1),
+                'samples' => count($keep),
+                'history' => $hist24
+            ]);
+            break;
+
+        case 'air_quality':
+            $loc = getLocation();
+            if (!$loc) {
+                echo json_encode(['ok' => false, 'error' => 'Localisation non configuree']);
+                break;
+            }
+            $lat = $loc['latitude'];
+            $lon = $loc['longitude'];
+            $tz = isset($loc['timezone']) ? $loc['timezone'] : 'Europe/Paris';
+            $url = "https://air-quality-api.open-meteo.com/v1/air-quality?latitude=$lat&longitude=$lon&hourly=european_aqi,pm2_5,pm10,ozone&timezone=" . urlencode($tz) . "&forecast_days=1";
+            $ctx = stream_context_create(['http' => ['timeout' => 10]]);
+            $resp = @file_get_contents($url, false, $ctx);
+            if ($resp === false) {
+                echo json_encode(['ok' => false, 'error' => 'Donnees indisponibles']);
+                break;
+            }
+            $data = json_decode($resp, true);
+            if (!$data || !isset($data['hourly']) || !isset($data['hourly']['time'])) {
+                echo json_encode(['ok' => false, 'error' => 'Format invalide']);
+                break;
+            }
+            $now = date('Y-m-d\TH:00');
+            $cur = null;
+            for ($i = count($data['hourly']['time']) - 1; $i >= 0; $i--) {
+                if ($data['hourly']['time'][$i] <= $now) {
+                    $cur = [
+                        'aqi' => isset($data['hourly']['european_aqi'][$i]) ? (int)$data['hourly']['european_aqi'][$i] : null,
+                        'pm25' => isset($data['hourly']['pm2_5'][$i]) ? round((float)$data['hourly']['pm2_5'][$i], 1) : null,
+                        'pm10' => isset($data['hourly']['pm10'][$i]) ? round((float)$data['hourly']['pm10'][$i], 1) : null,
+                        'ozone' => isset($data['hourly']['ozone'][$i]) ? round((float)$data['hourly']['ozone'][$i], 1) : null
+                    ];
+                    break;
+                }
+            }
+            if ($cur === null) {
+                $cur = [
+                    'aqi' => isset($data['hourly']['european_aqi'][0]) ? (int)$data['hourly']['european_aqi'][0] : null,
+                    'pm25' => isset($data['hourly']['pm2_5'][0]) ? round((float)$data['hourly']['pm2_5'][0], 1) : null,
+                    'pm10' => isset($data['hourly']['pm10'][0]) ? round((float)$data['hourly']['pm10'][0], 1) : null,
+                    'ozone' => isset($data['hourly']['ozone'][0]) ? round((float)$data['hourly']['ozone'][0], 1) : null
+                ];
+            }
+            $aqi = $cur['aqi'];
+            $level = 'Bon';
+            $cls = 'aq-good';
+            if ($aqi !== null) {
+                if ($aqi >= 60) { $level = 'Tres mauvais'; $cls = 'aq-very'; }
+                elseif ($aqi >= 40) { $level = 'Mauvais'; $cls = 'aq-bad'; }
+                elseif ($aqi >= 20) { $level = 'Moyen'; $cls = 'aq-moy'; }
+            }
+            echo json_encode([
+                'ok' => true,
+                'aqi' => $aqi,
+                'level' => $level,
+                'cls' => $cls,
+                'pm25' => $cur['pm25'],
+                'pm10' => $cur['pm10'],
+                'ozone' => $cur['ozone']
+            ]);
             break;
 
         default:

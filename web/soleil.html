@@ -1,0 +1,241 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Meteo">
+<link rel="manifest" href="manifest.json">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Soleil - Station Meteo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:Helvetica,Arial,sans-serif;color:#fff;overflow:hidden;background:#333}
+#bg{position:fixed;top:0;left:0;right:0;bottom:0;z-index:0;-webkit-transition:background 1.5s;transition:background 1.5s}
+.bg-pre{background:linear-gradient(180deg,#131a2e 0%,#1c2745 100%)}
+.bg-nite{background:linear-gradient(180deg,#0b1526 0%,#16213a 100%)}
+.bg-rise{background:linear-gradient(180deg,#ff9a3c 0%,#ffc37d 55%,#7ec8e3 100%)}
+.bg-morn{background:linear-gradient(180deg,#7ec8e3 0%,#bfe8ff 60%,#ffd9a0 100%)}
+.bg-noon{background:linear-gradient(180deg,#2196f3 0%,#4fc3f7 60%,#a5d8f5 100%)}
+.bg-day{background:linear-gradient(180deg,#42a5f5 0%,#64b5f6 60%,#cfe6f8 100%)}
+.bg-dusk{background:linear-gradient(180deg,#ff8a5c 0%,#ffb64d 60%,#ffd9a0 100%)}
+.bg-set{background:linear-gradient(180deg,#2c4a63 0%,#123a57 60%,#0b2e4f 100%)}
+#wrap{position:relative;z-index:2;height:100%;display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;-webkit-flex-direction:column;flex-direction:column;padding:64px 10px 12px}
+#shade{position:fixed;top:0;left:0;right:0;bottom:0;z-index:1;background:linear-gradient(180deg,rgba(0,0,0,.32) 0%,rgba(0,0,0,.22) 45%,rgba(0,0,0,.38) 100%);pointer-events:none}
+.hdr{position:absolute;top:0;left:0;right:0;display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-align:center;-webkit-align-items:center;align-items:center;-webkit-box-pack:justify;-webkit-justify-content:space-between;justify-content:space-between;padding:14px 14px 0;z-index:3}
+.nav{color:#fff;text-decoration:none;font-size:14px;padding:6px 12px;border-radius:12px;background:rgba(255,255,255,.2)}
+.ttl{font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-align:center}
+.nt{width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,.15);color:#fff;font-size:20px;cursor:pointer;line-height:44px;text-align:center}
+#box{-webkit-box-flex:1;-webkit-flex:1;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;text-align:center;padding:2px 4px 10px}
+.datecard{display:inline-block;background:rgba(0,0,0,.28);border-radius:14px;padding:9px 18px;font-size:14px;font-weight:600;letter-spacing:.5px;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.datecard .dj{font-size:11px;letter-spacing:1px;opacity:.8;text-transform:uppercase}
+.arcbox{position:relative;width:100%;max-width:360px;margin:6px auto 0}
+.arcbox svg{width:100%;height:auto;display:block}
+.trail{stroke:rgba(255,255,255,.35);fill:none;stroke-width:1.5;stroke-dasharray:4 4}
+.base{stroke:rgba(255,255,255,.3);fill:none;stroke-width:1}
+.halo{fill:#ffd54f;opacity:.25}
+.sun{fill:#ffe082}
+.sun.dim{opacity:0}
+.lblrow{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-pack:justify;-webkit-justify-content:space-between;justify-content:space-between;max-width:360px;margin:-4px auto 6px;font-size:10px;padding:0 8px;text-shadow:0 1px 3px rgba(0,0,0,.45)}
+.lblrow .m{opacity:.7}
+.grille{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-flex-wrap:wrap;flex-wrap:wrap;-webkit-box-pack:center;-webkit-justify-content:center;justify-content:center;gap:8px;max-width:400px;margin:0 auto}
+.cell{background:rgba(20,30,50,.38);border-radius:14px;padding:10px 14px;width:170px;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.cell .cl{font-size:10px;letter-spacing:1px;text-transform:uppercase;opacity:.8}
+.cell .cv{font-size:20px;font-weight:600;margin-top:3px}
+.cell .cs{font-size:10px;opacity:.75;margin-top:2px}
+.timer{margin:8px auto 0;max-width:400px;background:rgba(20,30,50,.35);border-radius:14px;padding:10px 16px;display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-pack:justify;-webkit-justify-content:space-between;justify-content:space-between;-webkit-box-align:center;-webkit-align-items:center;align-items:center;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.timer .tl{font-size:11px;opacity:.85;text-align:left}
+.timer .tv{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
+.timer .tv small{font-size:10px;opacity:.75;font-weight:400}
+.done{display:none;margin:8px auto 0;max-width:400px;background:rgba(20,30,50,.35);border-radius:14px;padding:12px 18px;font-size:15px;font-weight:600;letter-spacing:.5px;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.done .sub{font-size:11px;opacity:.8;margin-top:3px;font-weight:400}
+#msg{padding:20px;text-align:center;font-size:14px;opacity:.8}
+body.night #bg{background:#000!important}
+body.night .nav{background:rgba(20,30,50,.5);color:#5a7a8a}
+body.night .nt{background:rgba(100,120,150,.3);color:#8aa0b0}
+body.night .ttl{color:#eef2f6}
+body.night .cell{background:rgba(20,30,50,.45);color:#c6d2dd}
+body.night .cell .cl{color:#7c8a99}
+body.night .datecard{background:rgba(20,30,50,.45);color:#c6d2dd}
+body.night .timer{background:rgba(20,30,50,.45);color:#c6d2dd}
+body.night .timer .tl{color:#7c8a99}
+body.night .lblrow{color:#6a7a8a}
+body.night .trail{stroke:rgba(140,160,190,.35)}
+body.night .base{stroke:rgba(140,160,190,.3)}
+body.night .sun{fill:#9aa2ab}
+body.night .halo{fill:#9aa2ab;opacity:.12}
+body.night .done{background:rgba(20,30,50,.45);color:#c6d2dd}
+</style>
+</head>
+<body>
+<div id="bg" class="bg-nite"></div>
+<div id="shade"></div>
+<div id="wrap">
+  <div class="hdr">
+    <a href="index.html" target="_self" class="nav">&#8592; Retour</a>
+    <div class="ttl">Soleil</div>
+    <button class="nt" id="nightBtn" title="Mode nuit">&#9790;</button>
+  </div>
+  <div id="box"><div style="padding:16px;text-align:center;opacity:.6">Chargement...</div></div>
+</div>
+<script>
+var API='api.php';
+var nightMode=false;
+function $(i){return document.getElementById(i)}
+function noop(){}
+function J(u,cb,eb){
+  var x=new XMLHttpRequest();
+  x.open('GET',API+'?action='+u,true);
+  x.onload=function(){try{cb(JSON.parse(x.responseText))}catch(e){if(eb)eb()}};
+  x.onerror=function(){if(eb)eb()};
+  x.send();
+}
+function isNight(){var h=new Date().getHours();return h>=21||h<7;}
+function setNight(on){
+  nightMode=on;
+  document.body.className=on?'night':'';
+  var b=$('nightBtn');if(b)b.textContent=on?'\u2600':'\u263E';
+  lastSky='';
+}
+function pad(x){return (x<10?'0':'')+x;}
+function hhmm(ms){
+  var d=new Date(ms);
+  return pad(d.getHours())+':'+pad(d.getMinutes());
+}
+function fmtDur(ms){
+  if(ms<0)ms=0;
+  var s=Math.floor(ms/1000);
+  return pad(Math.floor(s/3600))+':'+pad(Math.floor(s/60)%60)+':'+pad(s%60);
+}
+function fmtLong(ms){
+  if(ms<0)ms=0;
+  var s=Math.floor(ms/1000);
+  var h=Math.floor(s/3600),m=Math.floor(s/60)%60,sec=s%60;
+  return h+' h '+pad(m)+' min '+pad(sec)+' s';
+}
+function dname(y,m,d){
+  var dt=new Date(y,m-1,d,12,0,0);
+  var J=['DIMANCHE','LUNDI','MARDI','MERCREDI','JEUDI','VENDREDI','SAMEDI'];
+  var M=['JANVIER','FEVRIER','MARS','AVRIL','MAI','JUIN','JUILLET','AOUT','SEPTEMBRE','OCTOBRE','NOVEMBRE','DECEMBRE'];
+  return {j:J[dt.getDay()],m:M[dt.getMonth()]};
+}
+function parseT(s){
+  var a=String(s).split('T');
+  var d=a[0].split('-');
+  var t=a[1].split(':');
+  return new Date(+d[0],+d[1]-1,+d[2],+t[0],+t[1],0,0);
+}
+var SR,SS,NOON;
+var lastSky='';
+var W=320,H=180,CX=160,CY=150,R=130;
+function skyClass(now){
+  if(now<SR)return 'bg-pre';
+  if(now>=SS){
+    return (now-SS<3600000)?'bg-set':'bg-nite';
+  }
+  var f=(now-SR)/(SS-SR);
+  if(f<.18)return 'bg-rise';
+  if(f<.42)return 'bg-morn';
+  if(f<.6)return 'bg-noon';
+  if(f<.82)return 'bg-day';
+  return 'bg-dusk';
+}
+function sunPos(now){
+  var f=(now-SR)/(SS-SR);
+  if(f<0)f=0;
+  if(f>1)f=1;
+  var x=CX-R*Math.cos(Math.PI*f);
+  var y=CY-R*Math.sin(Math.PI*f);
+  return {x:x,y:y,f:f};
+}
+function tick(){
+  var now=new Date().getTime();
+  var sky=skyClass(now);
+  if(sky!==lastSky){
+    lastSky=sky;
+    var bg=$('bg');
+    if(nightMode){bg.style.background='#000';}
+    else{bg.style.background='';bg.className=sky;}
+  }
+  var p=sunPos(now);
+  var sun=$('sun'),halo=$('sunHalo'),done=$('done');
+  var inDay=(now>=SR&&now<SS);
+  if(sun){sun.setAttribute('cx',p.x);sun.setAttribute('cy',p.y);sun.setAttribute('class',inDay?'sun':'sun dim');}
+  if(halo){halo.setAttribute('cx',p.x);halo.setAttribute('cy',p.y);}
+  if(done)done.style.display=(now>=SS)?'block':'none';
+  var el=now-SR,rm=SS-now;
+  var ev=$('eVal'),rv=$('rVal');
+  if(ev)ev.innerHTML=inDay?fmtLong(el):'00:00:00';
+  if(rv)rv.innerHTML=inDay?fmtLong(rm):'00:00:00';
+}
+function render(){
+  var now=new Date();
+  var t=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
+  var pr=dname(now.getFullYear(),now.getMonth()+1,now.getDate());
+  var dur=SS-SR;
+  var html='';
+  html+='<div class="datecard"><div class="dj">'+pr.j+' '+pr.m.toLowerCase()+'</div><div>'+t+'</div></div>';
+  html+='<div class="arcbox"><svg viewBox="0 0 '+W+' '+H+'" aria-hidden="true">';
+  html+='<path class="trail" d="M '+(CX-R)+' '+CY+' A '+R+' '+R+' 0 0 1 '+(CX+R)+' '+CY+'"/>';
+  html+='<line class="base" x1="'+(CX-R-10)+'" y1="'+CY+'" x2="'+(CX+R+10)+'" y2="'+CY+'"/>';
+  html+='<circle id="sunHalo" class="halo" cx="'+(CX)+'" cy="'+(CY-R)+'" r="26"/>';
+  html+='<circle id="sun" class="sun dim" cx="'+(CX)+'" cy="'+(CY-R)+'" r="13"/>';
+  html+='</svg></div>';
+  html+='<div class="lblrow"><span>Lever<br><span class="m">'+hhmm(SR.getTime())+'</span></span><span>Midi solaire<br><span class="m">'+hhmm(NOON.getTime())+'</span></span><span>Coucher<br><span class="m">'+hhmm(SS.getTime())+'</span></span></div>';
+  html+='<div class="grille">';
+  html+='<div class="cell"><div class="cl">Lever du soleil</div><div class="cv">'+hhmm(SR.getTime())+'</div></div>';
+  html+='<div class="cell"><div class="cl">Midi solaire</div><div class="cv">'+hhmm(NOON.getTime())+'</div></div>';
+  html+='<div class="cell"><div class="cl">Coucher du soleil</div><div class="cv">'+hhmm(SS.getTime())+'</div></div>';
+  html+='<div class="cell"><div class="cl">Duree totale du jour</div><div class="cv">'+fmtDur(dur)+'</div></div>';
+  html+='</div>';
+  html+='<div class="timer"><div class="tl">Ecoule depuis le lever</div><div class="tv"><span id="eVal">--</span></div></div>';
+  html+='<div class="timer"><div class="tl">Restant avant le coucher</div><div class="tv"><span id="rVal">--</span></div></div>';
+  html+='<div class="done" id="done"><div>Journee terminee</div><div class="sub">Le lever aura lieu demain.</div></div>';
+  $('box').innerHTML=html;
+}
+function load(){
+  J('location',function(loc){
+    if(!loc||!loc.configured){
+      $('box').innerHTML='<div id="msg">Localisation non configuree. Revenir a l\'accueil pour configurer.</div>';
+      return;
+    }
+    var url='https://api.open-meteo.com/v1/forecast?latitude='+loc.latitude+'&longitude='+loc.longitude
+      +'&daily=sunrise,sunset&timezone='+encodeURIComponent(loc.timezone||'Europe/Paris')+'&forecast_days=1';
+    var x=new XMLHttpRequest();
+    x.open('GET',url,true);
+    x.timeout=12000;
+    x.onload=function(){
+      try{
+        var d=JSON.parse(x.responseText);
+        if(d&&d.daily&&d.daily.sunrise&&d.daily.sunrise.length){
+          var t=d.daily.time[0];
+          var now=new Date();
+          var today=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
+          var idx=0;
+          if(d.daily.time[0]!==today&&d.daily.time[1]===today)idx=1;
+          SR=parseT(d.daily.sunrise[idx]);
+          SS=parseT(d.daily.sunset[idx]);
+          NOON=new Date((SR.getTime()+SS.getTime())/2);
+          render();
+          tick();
+        }
+        else{$('box').innerHTML='<div id="msg">Donnees solaires indisponibles.</div>';}
+      }catch(e){$('box').innerHTML='<div id="msg">Donnees solaires indisponibles.</div>';}
+    };
+    x.onerror=function(){$('box').innerHTML='<div id="msg">Reseau indisponible.</div>';};
+    x.ontimeout=function(){$('box').innerHTML='<div id="msg">Delai depasse.</div>';};
+    x.send();
+  },function(){$('box').innerHTML='<div id="msg">Localisation indisponible.</div>';});
+}
+setNight(isNight());
+$('nightBtn').onclick=function(){setNight(!nightMode);tick();};
+load();
+setInterval(tick,1000);
+</script>
+</body>
+</html>

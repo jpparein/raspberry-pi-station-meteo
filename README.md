@@ -133,12 +133,19 @@ Le bouton **Mesurer** utilise `live_read.py`. Il permet de satisfaire immédiate
 ├── web/
 │   ├── index.html          ← page principale
 │   ├── charts.html         ← statistiques
+│   ├── previsions.html     ← prévisions 7 jours
+│   ├── barometre.html      ← baromètre dédié
+│   ├── air-pollens.html    ← qualité de l'air et pollens
+│   ├── soleil.html         ← lever/coucher du soleil
 │   ├── api.php             ← API JSON
 │   ├── app.js              ← JavaScript
+│   ├── manifest.json       ← PWA
+│   ├── icon.svg            ← icône PWA
 │   └── .htaccess           ← cache désactivé
 ├── scripts/
 │   ├── collect.py          ← collecte DHT22 (service)
-│   └── live_read.py        ← mesure instantanée
+│   ├── live_read.py        ← mesure instantanée
+│   └── bmp280_read.py      ← lecture BMP280 (I2C)
 ├── service/
 │   └── meteo.service       ← service systemd
 ├── database/

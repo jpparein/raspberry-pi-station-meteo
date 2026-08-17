@@ -21,7 +21,8 @@ Le résultat n'a évidemment pas vocation à concurrencer Météo-France, mais i
 
 ## Ce qu'elle sait faire
 
-- mesure locale de la température et de l'humidité avec un DHT22 ;
+- mesure locale de la température et de l'humidité avec un DHT11 ou DHT22 ;
+- baromètre BMP280 en option (pression atmosphérique) ;
 - collecte automatique environ toutes les 5 minutes ;
 - stockage des mesures dans une base SQLite ;
 - mesure instantanée à la demande, sans l'enregistrer dans l'historique ;
@@ -33,6 +34,7 @@ Le résultat n'a évidemment pas vocation à concurrencer Météo-France, mais i
 - catégorie d'humidité et calcul du point de rosée ;
 - affichage discret de la température du processeur du Raspberry Pi ;
 - interface tactile compatible avec Safari sous iOS 12.5.7 ;
+- installation automatisée en une seule commande ;
 - aucun compte en ligne et aucune clé API nécessaires.
 
 > Les mesures et l'historique restent à la maison, sur le Raspberry Pi. Seules les prévisions et les heures de lever/coucher du soleil nécessitent Internet via Open-Meteo.
@@ -81,7 +83,7 @@ Le module utilisé possède trois broches : `+`, `OUT` et `−`.
 
 Le module DHT22 visible sur les photos intègre déjà son électronique de support. Vérifiez néanmoins le marquage de votre propre module : l'ordre des broches peut varier selon le fabricant.
 
-![Le capteur seul](docs/images/14%20capteur%20seul.jpg)
+![Le capteur seul](docs/images/14-capteur-seul.jpg)
 
 ### Préparation du câble récupéré
 
@@ -103,7 +105,7 @@ Le repérage `+`, `OUT` et `−` évite de jouer à la loterie au moment du bran
 
 ![Branchement sur le Raspberry Pi](docs/images/06-branchement-raspberry-pi.jpg)
 
-![Capteurs avec fils Dupont](docs/images/30%20capteurs%20avec%20dupont.MP.jpg)
+![Capteurs avec fils Dupont](docs/images/30-capteurs-dupont.jpg)
 
 ## Installation extérieure
 

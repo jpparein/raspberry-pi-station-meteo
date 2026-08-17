@@ -116,7 +116,7 @@ Le bouton **Mesurer** utilise `live_read.py`. Il permet de satisfaire immédiate
 
 ![Brochage du capteur DHT22](docs/images/02-capteur-dht22-brochage.jpg)
 
-> Ajouter une résistance pull-up de 4.7kΩ entre DATA et VCC si le module ne l'a pas intégrée. Vérifiez le marquage de votre module : l'ordre des broches peut varier selon le fabricant.
+> Ajouter une résistance pull-up de 4.7kΩ entre DATA et VCC si le module ne l'a pas intégrée. Dans mon cas (module DHT22 avec PCB bleu), elle est déjà présente. Vérifiez le marquage de votre module : l'ordre des broches peut varier selon le fabricant.
 
 ### BMP280 (optionnel) — quatre fils
 

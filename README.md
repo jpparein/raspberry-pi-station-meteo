@@ -32,7 +32,7 @@ Le résultat n'a évidemment pas vocation à concurrencer Météo-France, mais i
 
 ## Démonstration
 
-![Démonstration animée de l'interface](docs/images/demov2.gif)
+![Démonstration animée de l'interface](docs/images/DemoV2.gif)
 
 ## Ce qu'elle sait faire
 

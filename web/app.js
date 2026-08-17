@@ -1,4 +1,4 @@
-﻿var A='api.php',curFx='';
+var A='api.php',curFx='';
 var bg=document.getElementById('bg');
 var part=document.getElementById('part');
 var cldW=document.getElementById('cldW');
@@ -166,7 +166,7 @@ function setNight(on){
   nightMode=on;
   document.body.className=(on?'night':'')+(ecoMode?' eco':'');
   var btn=$('nightBtn');
-  if(btn)btn.textContent=on?'ÔÿÇ':'Ôÿ¥';
+  if(btn)btn.textContent=on?'☀':'☾';
   upd();
 }
 
@@ -354,14 +354,14 @@ function dewPoint(t,h){
 }
 function humInfo(h,t){
   var cat;
-  if(h<25)cat='Air tr├¿s sec';
+  if(h<25)cat='Air très sec';
   else if(h<40)cat='Air sec';
-  else if(h<=60)cat='Humidit├® mod├®r├®e';
+  else if(h<=60)cat='Humidité modérée';
   else if(h<=75)cat='Air humide';
-  else cat='Air tr├¿s humide';
+  else cat='Air très humide';
   var e=$('vH');if(e)e.textContent=h.toFixed(0)+'%';
-  var c=$('hCat');if(c)c.textContent=' ┬À '+cat;
-  var dw=$('hDew');if(dw)dw.textContent='Point de ros├®e '+dewPoint(t,h).toFixed(1).replace('.',',')+' ┬░C';
+  var c=$('hCat');if(c)c.textContent=' · '+cat;
+  var dw=$('hDew');if(dw)dw.textContent='Point de rosée '+dewPoint(t,h).toFixed(1).replace('.',',')+' °C';
   var lm=$('hLim');if(lm)lm.style.display=(h<=21)?'block':'none';
 }
 function cpuInfo(){
@@ -370,9 +370,9 @@ function cpuInfo(){
     if(!e)return;
     if(d.error||typeof d.temperature!=='number'){e.textContent='';e.className='cpu';return;}
     var t=d.temperature;
-    if(t>=70){e.textContent=' ÔÇó CPU chaud '+t+'┬░';e.className='cpu hot';}
-    else if(t>=60){e.textContent=' ÔÇó CPU '+t+'┬░';e.className='cpu warn';}
-    else{e.textContent=' ÔÇó CPU '+t+'┬░';e.className='cpu';}
+    if(t>=70){e.textContent=' • CPU chaud '+t+'°';e.className='cpu hot';}
+    else if(t>=60){e.textContent=' • CPU '+t+'°';e.className='cpu warn';}
+    else{e.textContent=' • CPU '+t+'°';e.className='cpu';}
   });
 }
 function baro(){
@@ -485,9 +485,9 @@ function loadLocation(cb){
 }
 function updateLocUI(){
   var n=LOC?LOC.name:'';
-  var s=$('src'); if(s)s.textContent='Previsions pour '+(n||'ÔÇª')+' ┬À Open-Meteo.com';
+  var s=$('src'); if(s)s.textContent='Previsions pour '+(n||'…')+' · Open-Meteo.com';
   var b=$('locBtn');
-  if(b)b.textContent='Lieu : '+(n||'ÔÇª');
+  if(b)b.textContent='Lieu : '+(n||'…');
 }
 function locSearch(q){
   J('location_search&q='+encodeURIComponent(q),function(d){
@@ -496,7 +496,7 @@ function locSearch(q){
     d.forEach(function(r){
       var b=document.createElement('button');
       b.className='loc-res';
-      b.textContent=r.name+(r.admin2?(' ÔÇö '+r.admin2):'')+(r.admin1?(', '+r.admin1):'');
+      b.textContent=r.name+(r.admin2?(' — '+r.admin2):'')+(r.admin1?(', '+r.admin1):'');
       b.onclick=function(){
         var all=box.querySelectorAll('.loc-res'); for(var i=0;i<all.length;i++)all[i].className='loc-res';
         b.className='loc-res sel'; pendingLoc=r;

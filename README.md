@@ -8,7 +8,7 @@
 ![Baromètre](https://img.shields.io/badge/BMP280-optionnel-blue)
 ![Statut](https://img.shields.io/badge/Statut-Fonctionnel-brightgreen)
 
-Tout est parti d'un constat très scientifique : chez moi, j'avais un **Raspberry Pi 2B**, une vieille **clé Wi-Fi**, un **iPad Air sous iOS 12.5.7**, un ancien câble téléphonique RJ11 et quelques composants qui dormaient tranquillement dans mes tiroirs.
+Tout est parti d'un constat très scientifique : chez moi, j'avais un **Raspberry Pi 2B**, une vieille **clé Wi-Fi** (pour le connecter au routeur, pas de câble Ethernet chez moi), un **iPad Air sous iOS 12.5.7**, un ancien câble téléphonique RJ11 et quelques composants qui dormaient tranquillement dans mes tiroirs.
 
 Plutôt que de les laisser poursuivre leur carrière de ramasse-poussière, j'ai décidé d'en faire une station météo locale. Elle mesure la température, l'humidité et la pression, conserve un historique, affiche les prévisions, la qualité de l'air, les pollens, les informations solaires et transforme un ancien écran (iPad, tablette Android, etc.) en écran permanent.
 

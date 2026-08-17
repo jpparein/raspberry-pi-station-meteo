@@ -10,7 +10,7 @@
 
 Tout est parti d'un constat très scientifique : chez moi, j'avais un **Raspberry Pi 2B**, une vieille **clé Wi-Fi**, un **iPad Air sous iOS 12.5.7**, un ancien câble téléphonique RJ11 et quelques composants qui dormaient tranquillement dans mes tiroirs.
 
-Plutôt que de les laisser poursuivre leur carrière de ramasse-poussière, j'ai décidé d'en faire une station météo locale avec un capteur **DHT22 / AM2302**. Elle mesure la température et l'humidité, conserve un historique, affiche les prévisions et transforme l'ancien iPad en écran permanent.
+Plutôt que de les laisser poursuivre leur carrière de ramasse-poussière, j'ai décidé d'en faire une station météo locale. Elle mesure la température, l'humidité et la pression, conserve un historique, affiche les prévisions, la qualité de l'air, les pollens, les informations solaires et transforme l'ancien iPad en écran permanent.
 
 Le résultat n'a évidemment pas vocation à concurrencer Météo-France, mais il est plutôt complet pour un projet fabriqué essentiellement avec ce que j'avais déjà sous la main.
 
@@ -23,36 +23,41 @@ Le résultat n'a évidemment pas vocation à concurrencer Météo-France, mais i
 ## Ce qu'elle sait faire
 
 ### Mesures et données
-- mesure locale de la température et de l'humidité avec un **DHT11** ou **DHT22** ;
+- mesure locale de la **température** et de l'**humidité** avec un DHT11 ou DHT22 ;
 - **baromètre BMP280** en option (pression atmosphérique) ;
 - collecte automatique environ toutes les 5 minutes ;
 - stockage des mesures dans une base SQLite ;
-- mesure instantanée à la demande, sans l'enregistrer dans l'historique ;
-- statistiques sur 24 heures (min, moyenne, max) ;
-- graphiques sur 24 heures, 7 jours et 30 jours ;
-- prévisions horaires fournies par Open-Meteo ;
-- choix de la commune au premier lancement.
+- **mesure instantanée** à la demande (bouton Mesurer), sans enregistrement ;
+- calcul du **point de rosée** ;
+- catégorie d'humidité (sec, modéré, humide, très humide) ;
+- affichage de la **température CPU** du Raspberry Pi.
 
-### Interface et affichage
-- animations adaptées à la météo : soleil, nuages, pluie, neige et orage ;
-- catégorie d'humidité et calcul du point de rosée ;
-- affichage discret de la température du processeur du Raspberry Pi ;
-- interface tactile compatible avec Safari sous iOS 12.5.7.
+### Pages et navigation
+- **page principale** : température, humidité, ressenti, animations météo ;
+- **page Statistiques** : min, moyenne, max sur 24h, graphiques 24h/7j/30j ;
+- **page Prévisions** : prévisions horaires sur 7 jours via Open-Meteo ;
+- **page Baromètre** : pression atmosphérique, tendance, historique ;
+- **page Air et pollens** : qualité de l'air et indices de pollens ;
+- **page Soleil** : lever, coucher, durée du jour, position du soleil.
 
-### Modes d'économie
-- **mode nuit** : se déclenche automatiquement selon le lever et le coucher du soleil de la commune configurée, avec basculement manuel possible ;
-- **mode économie** : désactive les animations et les particules côté navigateur pour réduire la charge, idéal sur les tablettes anciennes ou les appareils moins puissants.
+### Modes d'affichage
+- **animations météo** : soleil, nuages, pluie, neige, orage — adaptées aux conditions ;
+- **mode nuit** : automatique selon le lever/coucher du soleil de la commune, avec bouton de basculement manuel ;
+- **mode économie** : désactive les animations et particules côté navigateur, idéal sur tablettes anciennes ;
+- **fond dynamique** : la couleur de fond change selon la température (chaud, doux, frais, froid).
 
-### Installation
-- installation automatisée en une seule commande ;
-- détection automatique des capteurs ;
+### Fonctionnalités
+- choix de la commune au premier lancement (recherche par nom) ;
+- bouton de réinitialisation de la commune ;
+- **PWA** : installable sur l'écran d'accueil (manifest.json) ;
+- interface tactile compatible Safari iOS 12.5.7 ;
 - aucun compte en ligne et aucune clé API nécessaires.
 
-> Les mesures et l'historique restent à la maison, sur le Raspberry Pi. Seules les prévisions et les heures de lever/coucher du soleil nécessitent Internet via Open-Meteo.
+> Les mesures et l'historique restent à la maison, sur le Raspberry Pi. Seules les prévisions, la qualité de l'air et les heures de lever/coucher du soleil nécessitent Internet via Open-Meteo.
 
 ## Matériel compatible
 
-| Composant | Compatibilité |
+| Raspberry Pi | Compatibilité |
 |---|---|
 | Raspberry Pi 2 Model B | Oui |
 | Raspberry Pi 3 / 3B+ | Oui |
@@ -112,6 +117,8 @@ Le bouton **Mesurer** utilise `live_read.py`. Il permet de satisfaire immédiate
 | SCL | GPIO 3 (SCL) | 5 | Horloge I2C |
 | SDA | GPIO 2 (SDA) | 3 | Données I2C |
 
+![Capteur barométrique](docs/images/CapteurBarometrique.jpg)
+
 > Le BMP280 nécessite l'activation du bus I2C. L'installateur s'en charge automatiquement.
 
 ### Préparation du câble récupéré
@@ -133,6 +140,8 @@ Le repérage `+`, `OUT` et `−` évite de jouer à la loterie au moment du bran
 ### Côté Raspberry Pi
 
 ![Branchement sur le Raspberry Pi](docs/images/06-branchement-raspberry-pi.jpg)
+
+![Montage final](docs/images/MontageFinal.jpg)
 
 ## Installation extérieure
 
@@ -227,6 +236,31 @@ sudo systemctl status apache2
 sudo apache2ctl configtest
 ```
 
+### Activer I2C (pour BMP280)
+
+Si l'installateur n'a pas réussi à activer I2C, voici la procédure manuelle :
+
+```bash
+# Option 1 : via raspi-config
+sudo raspi-config
+# Interface Options → I2C → Enable
+sudo reboot
+
+# Option 2 : manuellement
+echo "dtparam=i2c_arm=on" | sudo tee -a /boot/firmware/config.txt
+sudo reboot
+```
+
+Vérification après redémarrage :
+
+```bash
+# Vérifier que le bus I2C existe
+ls /dev/i2c-*
+
+# Scanner le bus (le BMP280 doit apparaître à 0x76 ou 0x77)
+i2cdetect -y 1
+```
+
 ### Le BMP280 n'est pas détecté
 
 ```bash
@@ -237,13 +271,46 @@ ls /dev/i2c-*
 i2cdetect -y 1
 ```
 
-Le BMP280 doit apparaître à l'adresse `0x76` ou `0x77`.
+Le BMP280 doit apparaître à l'adresse `0x76` ou `0x77`. Si ce n'est pas le cas, vérifiez le câblage SDA/SCL et l'alimentation 3.3V.
 
 ### Les prévisions sont absentes ou incorrectes
 
 - vérifiez l'accès Internet du Raspberry Pi ;
 - vérifiez la commune affichée dans l'interface ;
 - utilisez le bouton de réinitialisation pour choisir une autre commune.
+
+### La page affiche une ancienne version
+
+L'application envoie des en-têtes anti-cache, mais Safari peut conserver des anciens fichiers. Fermez complètement l'application, rouvrez-la, puis videz les données Safari si nécessaire.
+
+## API disponible
+
+| Action | Méthode | Fonction |
+|---|---|---|
+| `current` | GET | Dernière mesure automatique |
+| `live` | GET | Mesure instantanée non enregistrée |
+| `forecast` | GET | Prévisions de la commune configurée |
+| `stats_24h` | GET | Statistiques des dernières 24 heures |
+| `chart_24h` | GET | Données du graphique sur 24 heures |
+| `chart_7j` | GET | Données du graphique sur 7 jours |
+| `chart_30j` | GET | Données du graphique sur 30 jours |
+| `sensor_status` | GET | État du collecteur |
+| `cpu_temp` | GET | Température du processeur |
+| `pressure` | GET | Pression atmosphérique (BMP280) |
+| `air_quality` | GET | Qualité de l'air |
+| `location` | GET | Localisation configurée |
+| `location_search&q=...` | GET | Recherche de commune |
+| `location_save` | POST | Enregistrement de la commune |
+| `location_reset` | POST | Suppression de la commune |
+
+Exemples :
+
+```bash
+curl -s "http://localhost/meteo-v2/api.php?action=current"
+curl -s "http://localhost/meteo-v2/api.php?action=stats_24h"
+curl -s "http://localhost/meteo-v2/api.php?action=cpu_temp"
+curl -s "http://localhost/meteo-v2/api.php?action=pressure"
+```
 
 ## Crédits
 

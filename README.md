@@ -5,7 +5,7 @@
 ![PHP](https://img.shields.io/badge/PHP-Apache-777BB4?logo=php&logoColor=white)
 ![SQLite](https://img.shields.io/badge/Base-SQLite-003B57?logo=sqlite&logoColor=white)
 ![Capteur](https://img.shields.io/badge/Capteur-DHT11/DHT22-43A047)
-![Baromètre](https://img.shields.io/badge/Baromètre-BMP280-optional-blue)
+![Baromètre](https://img.shields.io/badge/BMP280-optionnel-blue)
 ![Statut](https://img.shields.io/badge/Statut-Fonctionnel-brightgreen)
 
 Tout est parti d'un constat très scientifique : chez moi, j'avais un **Raspberry Pi 2B**, une vieille **clé Wi-Fi**, un **iPad Air sous iOS 12.5.7**, un ancien câble téléphonique RJ11 et quelques composants qui dormaient tranquillement dans mes tiroirs.

@@ -106,9 +106,11 @@ Si un BMP280 est connecté, la pression atmosphérique est enregistrée en même
 
 Le bouton **Mesurer** utilise `live_read.py`. Il permet de satisfaire immédiatement le classique « oui, mais combien fait-il maintenant ? ». Cette lecture actualise l'écran sans être enregistrée : les statistiques restent basées uniquement sur les mesures automatiques.
 
-## Câblage
+---
 
-### DHT11 ou DHT22 — trois fils, pas un de plus
+# Partie 1 — Câblage et installation matérielle
+
+## Étape 1 — Brancher le DHT22 (ou DHT11)
 
 | Capteur | Raspberry Pi | Broche physique | Rôle |
 |---|---|---|---|
@@ -120,7 +122,7 @@ Le bouton **Mesurer** utilise `live_read.py`. Il permet de satisfaire immédiate
 
 > Ajouter une résistance pull-up de 4.7kΩ entre DATA et VCC si le module ne l'a pas intégrée. Dans mon cas (module DHT22 avec PCB bleu), elle est déjà présente. Vérifiez le marquage de votre module : l'ordre des broches peut varier selon le fabricant.
 
-### BMP280 (optionnel) — quatre fils
+## Étape 2 — Brancher le BMP280 (optionnel)
 
 | BMP280 | Raspberry Pi | Broche physique | Rôle |
 |---|---|---|---|
@@ -133,7 +135,7 @@ Le bouton **Mesurer** utilise `live_read.py`. Il permet de satisfaire immédiate
 
 > Le BMP280 nécessite l'activation du bus I2C. L'installateur s'en charge automatiquement. Une règle udev est ajoutée pour permettre au serveur web (www-data) d'accéder au bus I2C.
 
-### Préparation du câble récupéré
+## Étape 3 — Préparer le câble récupéré
 
 J'avais chez moi un ancien câble téléphonique RJ11 d'environ cinq mètres qui ne servait plus. Pour relier le capteur, inutile d'acheter un câble neuf : celui-ci possède quatre conducteurs et le DHT22 n'en demande que trois — alimentation, données et masse. Il fait parfaitement l'affaire. Le quatrième fil reste inutilisé et profite simplement de la promenade jusqu'au capteur.
 
@@ -149,11 +151,11 @@ Le repérage `+`, `OUT` et `−` évite de jouer à la loterie au moment du bran
 
 ![Raccordement final du DHT22](docs/images/09-raccordement-final-dht22.jpg)
 
-### Côté Raspberry Pi
+## Étape 4 — Côté Raspberry Pi
 
 ![Branchement sur le Raspberry Pi](docs/images/06-branchement-raspberry-pi.jpg)
 
-## Installation extérieure
+## Étape 5 — Installer le capteur à l'extérieur
 
 Le capteur doit être placé :
 
@@ -170,7 +172,11 @@ Le Raspberry Pi reste à l'intérieur, près du routeur, avec les deux capteurs 
 
 ![Montage final avec DHT22 et BMP280](docs/images/MontageFinal.jpg)
 
-## Installation logicielle
+---
+
+# Partie 2 — Installation logicielle
+
+## Étape 1 — Cloner le dépôt et lancer l'installateur
 
 L'installateur automatise tout. Plus besoin de taper vingt commandes à la main :
 
@@ -180,12 +186,13 @@ cd station-meteo
 bash install.sh
 ```
 
-L'installateur va :
-1. Détecter automatiquement le capteur (DHT11, DHT22, BMP280) ;
-2. Installer les dépendances (Apache, Python, venv) ;
-3. Activer I2C si un BMP280 est détecté ;
-4. Configurer le service systemd ;
-5. Démarrer la station.
+## Étape 2 — Ce que fait l'installateur
+
+1. Détecte automatiquement le capteur (DHT11, DHT22, BMP280) ;
+2. Installe les dépendances (Apache, Python, venv) ;
+3. Active I2C si un BMP280 est détecté ;
+4. Configure le service systemd ;
+5. Démarre la station.
 
 ## Donner une seconde vie à un ancien écran
 

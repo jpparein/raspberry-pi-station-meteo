@@ -186,6 +186,8 @@ cd station-meteo
 bash install.sh
 ```
 
+![Installateur](docs/images/installeur.png)
+
 ## Étape 2 — Ce que fait l'installateur
 
 1. Détecte automatiquement le capteur (DHT11, DHT22, BMP280) ;

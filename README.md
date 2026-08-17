@@ -204,11 +204,73 @@ bash install.sh
 
 ## Étape 2 — Ce que fait l'installateur
 
-1. Détecte automatiquement le capteur (DHT11, DHT22, BMP280) ;
-2. Installe les dépendances (Apache, Python, venv) ;
-3. Active I2C si un BMP280 est détecté ;
-4. Configure le service systemd ;
-5. Démarre la station.
+L'installateur est **interactif** : il pose des questions, affiche ce qu'il va faire, et vous pouvez tout annuler en cas de doute. Rien ne se lance sans votre accord.
+
+### 1/7 — Détection du matériel
+
+- Vérifie que le script tourne bien sur un Raspberry Pi 2 ou plus récent
+- Scanne le bus I²C pour chercher un BMP280 (adresses `0x76` ou `0x77`)
+- Cherche un capteur DHT dans les configurations existantes (GPIO 4 par défaut)
+- Si rien n'est trouvé, propose une configuration manuelle (choisir DHT11/DHT22 + GPIO)
+- Vous pouvez confirmer, modifier ou relancer la détection
+
+### 2/7 — Emplacement
+
+- Demande le dossier d'installation (défaut : `~/meteo-v2`)
+- Crée les sous-dossiers nécessaires : `scripts/`, `web/`, `data/`, `database/`, `config/`, `venv/`
+
+### 3/7 — Vérifications système
+
+- Confirme que c'est bien un Raspberry Pi (et pas un PC)
+- Vérifie la version du Pi (2 ou plus)
+- Vérifie que Python 3 est disponible
+- Teste la connexion internet (avertissement si absent, pas d'arrêt)
+
+### 4/7 — Dépendances système
+
+Installe via `apt` uniquement les paquets qui manquent :
+
+| Paquet | À quoi ça sert |
+|---|---|
+| `apache2` | Serveur web |
+| `libapache2-mod-php` | Support PHP dans Apache |
+| `php-sqlite3` | Lecture de la base SQLite depuis PHP |
+| `python3-pip` | Installation de packages Python |
+| `python3-venv` | Environnement virtuel Python (isole les dépendances) |
+| `i2c-tools` | Détection des capteurs I²C (si BMP280) |
+| `python3-smbus` | Accès I²C depuis Python (si BMP280) |
+
+Chaque paquet déjà installé est détecté et ignoré automatiquement.
+
+### 5/7 — Activation I2C (si BMP280)
+
+- Si un BMP280 a été détecté mais que le bus I²C n'est pas actif, propose de l'activer
+- Ajoute `dtparam=i2c_arm=on` dans `/boot/firmware/config.txt` (ou `/boot/config.txt` selon le modèle)
+- Crée une règle udev (`/etc/udev/rules.d/99-i2c.rules`) pour que le serveur web puisse accéder au bus I²C
+- Prévient qu'un redémarrage sera nécessaire après l'installation
+
+### 6/7 — Environnement Python
+
+- Crée un environnement virtuel (`venv`) pour ne pas polluer le système
+- Installe `adafruit-circuitpython-dht` (pour DHT11/DHT22) et/ou `smbus2` (pour BMP280)
+- Met à jour pip automatiquement
+
+### 7/7 — Installation et configuration
+
+- **Génère** `collect.py` (boucle de collecte toutes les 5 min) et `live_read.py` (lecture instantanée pour tests)
+- **Copie** les fichiers web (HTML, JS, CSS, PHP) et le script BMP280
+- **Corrige** les chemins dans `api.php` pour pointer vers le bon dossier
+- **Configure Apache** : alias `/meteo-v2`, cache désactivé, accès au dossier web
+- **Crée le service systemd** `meteo-v2` : démarrage automatique au boot, redémarrage en cas de crash
+- **Teste** la lecture du capteur, le service et l'accessibilité web
+- **Affiche** l'URL d'accès (`http://<IP>/meteo-v2`)
+
+### Ce que l'installateur ne touche pas
+
+- Il ne supprime aucun fichier existant
+- Il ne modifie pas la configuration réseau
+- Il ne touche pas aux autres services du Pi
+- Tout est installé dans le dossier choisi (défaut : `~/meteo-v2`)
 
 ## Donner une seconde vie à un ancien écran
 

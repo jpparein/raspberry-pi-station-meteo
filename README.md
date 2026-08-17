@@ -41,7 +41,7 @@ Le résultat n'a évidemment pas vocation à concurrencer Météo-France, mais i
 
 ### Modes d'économie
 - **mode nuit** : se déclenche automatiquement selon le lever et le coucher du soleil de la commune configurée, avec basculement manuel possible ;
-- **mode économie** : désactive les animations et les particules pour réduire la charge CPU, idéal sur les anciens Raspberry Pi.
+- **mode économie** : désactive les animations et les particules côté navigateur pour réduire la charge, idéal sur les tablettes anciennes ou les appareils moins puissants.
 
 ### Installation
 - installation automatisée en une seule commande ;

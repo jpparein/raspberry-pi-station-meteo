@@ -89,17 +89,17 @@ Le résultat n'a évidemment pas vocation à concurrencer Météo-France, mais i
 
 ## Où acheter les composants
 
-| Composant | Recherche Amazon | Autre |
+| Composant | Amazon (recherche) | Revendeurs FR |
 |---|---|---|
-| DHT22 / AM2302 (module 3 broches) | [Amazon](https://www.amazon.fr/s?k=DHT22+AM2302+module) | [Gotronics](https://www.gotronics.fr/) |
-| BMP280 (module I2C) | [Amazon](https://www.amazon.fr/s?k=BMP280+module+I2C) | [Gotronics](https://www.gotronics.fr/) |
-| Raspberry Pi 2B / 3B / 4 / Zero 2 W | [Amazon](https://www.amazon.fr/s?k=Raspberry+Pi) | [Kubii](https://www.kubii.fr/) |
-| Carte microSD 8 Go+ | [Amazon](https://www.amazon.fr/s?k=carte+microSD+32+Go) | — |
-| Câble RJ11 4 fils (ou câble téléphone) | [Amazon](https://www.amazon.fr/s?k=cable+RJ11+4+fils) | — |
-| Fils Dupont / gaine thermorétractable | [Amazon](https://www.amazon.fr/s?k=fils+Dupont+gaine+thermoretractable) | — |
+| DHT22 / AM2302 module 3 broches | [Amazon](https://www.amazon.fr/s?k=DHT22+AM2302+module+3+broches) | [Gotronic](https://www.gotronic.fr/art-dht22-capteur-temperature-humidite-33046.htm) |
+| BMP280 module I2C | [Amazon](https://www.amazon.fr/s?k=BMP280+module+I2C) | [Gotronic](https://www.gotronic.fr/art-bmp280-capteur-pression-33047.htm) |
+| Raspberry Pi 2B/3B/4/Zero 2 W | [Amazon](https://www.amazon.fr/s?k=Raspberry+Pi) | [Kubii](https://www.kubii.fr/16-raspberry-pi), [Gotronic](https://www.gotronic.fr/cat-raspberry-pi-65.htm) |
+| Carte microSD 32 Go | [Amazon](https://www.amazon.fr/s?k=carte+microSD+32+Go+classe+10) | — |
+| Câble RJ11 4 fils (téléphone) | [Amazon](https://www.amazon.fr/s?k=cable+RJ11+4+fils) | — |
+| Fils Dupont + gaine thermorétractable | [Amazon](https://www.amazon.fr/s?k=fils+Dupont+gaine+thermoretractable) | [Gotronic](https://www.gotronic.fr/cat-fils-et-cables-105.htm) |
 | Clé Wi-Fi USB (optionnel) | [Amazon](https://www.amazon.fr/s?k=clé+wifi+usb) | — |
 
-> Les liens Amazon sont des recherches génériques. Choisissez un vendeur bien noté. Pour le Raspberry Pi, privilégiez les revendeurs officiels (Kubii, Gotronics, etc.) pour éviter les contrefaçons.
+> Les liens Amazon sont des recherches prêtes à l'emploi. Les liens Gotronic/Kubii pointent vers la catégorie ou le produit direct. Choisissez un vendeur bien noté. Pour le Raspberry Pi, privilégiez les revendeurs officiels (Kubii, Gotronic) pour éviter les contrefaçons.
 
 ## Principe de fonctionnement
 

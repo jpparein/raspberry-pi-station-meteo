@@ -83,8 +83,6 @@ Le module utilisé possède trois broches : `+`, `OUT` et `−`.
 
 Le module DHT22 visible sur les photos intègre déjà son électronique de support. Vérifiez néanmoins le marquage de votre propre module : l'ordre des broches peut varier selon le fabricant.
 
-![Le capteur seul](docs/images/14-capteur-seul.jpg)
-
 ### Préparation du câble récupéré
 
 J'avais chez moi un ancien câble téléphonique RJ11 d'environ cinq mètres qui ne servait plus. Pour relier le capteur, inutile d'acheter un câble neuf : celui-ci possède quatre conducteurs et le DHT22 n'en demande que trois — alimentation, données et masse. Il fait parfaitement l'affaire. Le quatrième fil reste inutilisé et profite simplement de la promenade jusqu'au capteur.
@@ -104,8 +102,6 @@ Le repérage `+`, `OUT` et `−` évite de jouer à la loterie au moment du bran
 ### Côté Raspberry Pi
 
 ![Branchement sur le Raspberry Pi](docs/images/06-branchement-raspberry-pi.jpg)
-
-![Capteurs avec fils Dupont](docs/images/30-capteurs-dupont.jpg)
 
 ## Installation extérieure
 

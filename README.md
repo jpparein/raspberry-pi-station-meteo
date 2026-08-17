@@ -1,7 +1,5 @@
 # Station Météo - Raspberry Pi (Installation automatisée)
 
-Version avec installateur interactif. Pour l'installation manuelle, voir la branche `main`.
-
 ## Matériel nécessaire
 
 | Composant | Description |

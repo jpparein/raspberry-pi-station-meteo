@@ -87,6 +87,20 @@ Le résultat n'a évidemment pas vocation à concurrencer Météo-France, mais i
 | Carte microSD (8 Go min) | Système et base SQLite |
 | Alimentation USB-C ou micro-USB | Pour le Raspberry Pi |
 
+## Où acheter les composants
+
+| Composant | Recherche Amazon | Autre |
+|---|---|---|
+| DHT22 / AM2302 (module 3 broches) | [Amazon](https://www.amazon.fr/s?k=DHT22+AM2302+module) | [Gotronics](https://www.gotronics.fr/) |
+| BMP280 (module I2C) | [Amazon](https://www.amazon.fr/s?k=BMP280+module+I2C) | [Gotronics](https://www.gotronics.fr/) |
+| Raspberry Pi 2B / 3B / 4 / Zero 2 W | [Amazon](https://www.amazon.fr/s?k=Raspberry+Pi) | [Kubii](https://www.kubii.fr/) |
+| Carte microSD 8 Go+ | [Amazon](https://www.amazon.fr/s?k=carte+microSD+32+Go) | — |
+| Câble RJ11 4 fils (ou câble téléphone) | [Amazon](https://www.amazon.fr/s?k=cable+RJ11+4+fils) | — |
+| Fils Dupont / gaine thermorétractable | [Amazon](https://www.amazon.fr/s?k=fils+Dupont+gaine+thermoretractable) | — |
+| Clé Wi-Fi USB (optionnel) | [Amazon](https://www.amazon.fr/s?k=clé+wifi+usb) | — |
+
+> Les liens Amazon sont des recherches génériques. Choisissez un vendeur bien noté. Pour le Raspberry Pi, privilégiez les revendeurs officiels (Kubii, Gotronics, etc.) pour éviter les contrefaçons.
+
 ## Principe de fonctionnement
 
 ```mermaid

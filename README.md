@@ -14,7 +14,19 @@ Plutôt que de les laisser poursuivre leur carrière de ramasse-poussière, j'ai
 
 Le résultat n'a évidemment pas vocation à concurrencer Météo-France, mais il est plutôt complet pour un projet fabriqué essentiellement avec ce que j'avais déjà sous la main.
 
-![Station météo affichée sur un ancien iPad](docs/images/12-affichage-station-meteo-ipad.png)
+![Station météo affichée sur un ancien iPad](docs/images/interface%20v2.png)
+
+## Nouveautés v2
+
+- **Baromètre BMP280** : pression atmosphérique en temps réel avec tendance (hausse/baisse/stable), historique 24h, prévision météo déduite de la pression (orage/pluie/dégagement), min/max 24h.
+- **Indicateur qualité de l'air** sur la page principale (AQI européen + niveau coloré).
+- **Précision pluie** : distingue la pluie réelle (mm > 0) du simple risque (probabilité ≥ 30% sans précipitations).
+- **Flèches SVG** sur le bloc baromètre (blanches, visibles jour et nuit).
+- **Page Baromètre dédiée** : graphique canvas 24h, Δ1h/Δ3h/Δ24h, position dans l'intervalle min/max, prévision colorée.
+- **Boutons auto-masquants** : les boutons de navigation disparaissent après 30 secondes d'inactivité (fondu 1s).
+- **Mode économie par défaut** : désactive les animations au démarrage, idéal pour les tablettes anciennes.
+- **Icônes lune la nuit** dans le bandeau horaire et les prévisions.
+- **Manifest PWA** : installable sur l'écran d'accueil (manifest.json + icône SVG).
 
 ## Démonstration
 
@@ -33,10 +45,10 @@ Le résultat n'a évidemment pas vocation à concurrencer Météo-France, mais i
 - affichage de la **température CPU** du Raspberry Pi.
 
 ### Pages et navigation
-- **page principale** : température, humidité, ressenti, animations météo ;
+- **page principale** : température, humidité, point de rosée, baromètre, qualité de l'air, prévisions horaires, pluie ;
 - **page Statistiques** : min, moyenne, max sur 24h, graphiques 24h/7j/30j ;
 - **page Prévisions** : prévisions horaires sur 7 jours via Open-Meteo ;
-- **page Baromètre** : pression atmosphérique, tendance, historique ;
+- **page Baromètre** : pression atmosphérique, tendance, graphique 24h, prévision météo ;
 - **page Air et pollens** : qualité de l'air et indices de pollens ;
 - **page Soleil** : lever, coucher, durée du jour, position du soleil.
 
@@ -90,7 +102,7 @@ flowchart TD
 
 Le service `meteo-v2.service` garde `collect.py` éveillé. Le script lit le capteur sur le GPIO, puis ajoute une mesure à SQLite environ toutes les cinq minutes. Apache et PHP transforment ensuite ces données en JSON pour l'interface web.
 
-Si un BMP280 est connecté, la pression atmosphérique est enregistrée en même temps que la température et l'humidité.
+Si un BMP280 est connecté, la pression atmosphérique est enregistrée en même temps que la température et l'humidité. L'API `pressure` calcule également la tendance (hausse/baisse/stable) en comparant la pression actuelle à la moyenne des mesures il y a 3 heures, et propose une prévision météo basée sur l'évolution de la pression.
 
 Le bouton **Mesurer** utilise `live_read.py`. Il permet de satisfaire immédiatement le classique « oui, mais combien fait-il maintenant ? ». Cette lecture actualise l'écran sans être enregistrée : les statistiques restent basées uniquement sur les mesures automatiques.
 
@@ -119,7 +131,7 @@ Le bouton **Mesurer** utilise `live_read.py`. Il permet de satisfaire immédiate
 
 ![Capteur barométrique](docs/images/CapteurBarometrique.jpg)
 
-> Le BMP280 nécessite l'activation du bus I2C. L'installateur s'en charge automatiquement.
+> Le BMP280 nécessite l'activation du bus I2C. L'installateur s'en charge automatiquement. Une règle udev est ajoutée pour permettre au serveur web (www-data) d'accéder au bus I2C.
 
 ### Préparation du câble récupéré
 
@@ -138,6 +150,8 @@ Le repérage `+`, `OUT` et `−` évite de jouer à la loterie au moment du bran
 ![Raccordement final du DHT22](docs/images/09-raccordement-final-dht22.jpg)
 
 ### Côté Raspberry Pi
+
+![Branchement sur le Raspberry Pi](docs/images/06-branchement-raspberry-pi.jpg)
 
 ![Montage final](docs/images/MontageFinal.jpg)
 
@@ -201,6 +215,9 @@ python3 scripts/live_read.py
 
 # Vérifier la base de données
 sqlite3 data/meteo.db "SELECT * FROM mesures ORDER BY id DESC LIMIT 5;"
+
+# Tester le baromètre
+python3 scripts/bmp280_read.py
 ```
 
 ## Désinstallation
@@ -271,6 +288,10 @@ i2cdetect -y 1
 
 Le BMP280 doit apparaître à l'adresse `0x76` ou `0x77`. Si ce n'est pas le cas, vérifiez le câblage SDA/SCL et l'alimentation 3.3V.
 
+### Le BMP280 affiche des valeurs aberrantes
+
+Vérifiez l'endianness : le BMP280 stocke les données en petit-boutiste (LSB en premier). Le script `bmp280_read.py` gère automatiquement ce format. Si vousutilisez un autre script, assurez-vous de bien convertir les octets.
+
 ### Les prévisions sont absentes ou incorrectes
 
 - vérifiez l'accès Internet du Raspberry Pi ;
@@ -281,33 +302,75 @@ Le BMP280 doit apparaître à l'adresse `0x76` ou `0x77`. Si ce n'est pas le cas
 
 L'application envoie des en-têtes anti-cache, mais Safari peut conserver des anciens fichiers. Fermez complètement l'application, rouvrez-la, puis videz les données Safari si nécessaire.
 
+### La qualité de l'air ne s'affiche pas
+
+L'indicateur de qualité de l'air nécessite une connexion Internet (données Open-Meteo). Vérifiez que le Raspberry Pi est connecté et que la localisation est configurée.
+
 ## API disponible
 
-| Action | Méthode | Fonction |
+| Action | Méthode | Description |
 |---|---|---|
-| `current` | GET | Dernière mesure automatique |
-| `live` | GET | Mesure instantanée non enregistrée |
-| `forecast` | GET | Prévisions de la commune configurée |
-| `stats_24h` | GET | Statistiques des dernières 24 heures |
-| `chart_24h` | GET | Données du graphique sur 24 heures |
-| `chart_7j` | GET | Données du graphique sur 7 jours |
-| `chart_30j` | GET | Données du graphique sur 30 jours |
-| `sensor_status` | GET | État du collecteur |
-| `cpu_temp` | GET | Température du processeur |
-| `pressure` | GET | Pression atmosphérique (BMP280) |
-| `air_quality` | GET | Qualité de l'air |
+| `current` | GET | Dernière mesure automatique (température, humidité, timestamp) |
+| `live` | GET | Mesure instantanée non enregistrée (DHT22) |
+| `forecast` | GET | Prévisions horaires 7 jours (Open-Meteo) |
+| `stats_24h` | GET | Statistiques min/moy/max sur 24h |
+| `chart_24h` | GET | Données du graphique 24h (température + humidité) |
+| `chart_7j` | GET | Données du graphique 7 jours |
+| `chart_30j` | GET | Données du graphique 30 jours |
+| `sensor_status` | GET | État du collecteur (en ligne / âge) |
+| `cpu_temp` | GET | Température du processeur Raspberry Pi |
+| `pressure` | GET | Pression BMP280 + tendance + prévision |
+| `air_quality` | GET | Qualité de l'air européenne (AQI, PM2.5, PM10, ozone) |
 | `location` | GET | Localisation configurée |
-| `location_search&q=...` | GET | Recherche de commune |
+| `location_search&q=...` | GET | Recherche de commune (géocodage) |
 | `location_save` | POST | Enregistrement de la commune |
 | `location_reset` | POST | Suppression de la commune |
 
-Exemples :
+### Réponse `pressure`
+
+```json
+{
+  "ok": true,
+  "hpa": 1017.4,
+  "temp": 31.5,
+  "trend": "up",
+  "delta": 1.2,
+  "delta1h": 0.8,
+  "delta24h": -0.5,
+  "note": "Amelioration probable",
+  "forecast": "degage",
+  "min24": 1015.2,
+  "max24": 1018.1,
+  "samples": 26,
+  "history": [{"t": 1786875385, "h": 1017.57}]
+}
+```
+
+- `trend` : `up` (hausse ≥ 1 hPa/3h), `down` (baisse ≤ -1 hPa/3h), `stable`, `na` (pas assez de données)
+- `forecast` : `orage`, `pluie`, `degage`, `degradation`, `stabilite`
+- `history` : tableau des mesures 24h (timestamp + hPa) pour le graphique
+
+### Réponse `air_quality`
+
+```json
+{
+  "ok": true,
+  "aqi": 24,
+  "level": "Moyen",
+  "cls": "aq-moy",
+  "pm25": 4.2,
+  "pm10": 7.5,
+  "ozone": 61
+}
+```
+
+### Exemples
 
 ```bash
-curl -s "http://localhost/meteo-v2/api.php?action=current"
-curl -s "http://localhost/meteo-v2/api.php?action=stats_24h"
-curl -s "http://localhost/meteo-v2/api.php?action=cpu_temp"
-curl -s "http://localhost/meteo-v2/api.php?action=pressure"
+curl -s "http://localhost/meteo/api.php?action=current"
+curl -s "http://localhost/meteo/api.php?action=pressure"
+curl -s "http://localhost/meteo/api.php?action=air_quality"
+curl -s "http://localhost/meteo/api.php?action=stats_24h"
 ```
 
 ## Crédits
@@ -315,6 +378,7 @@ curl -s "http://localhost/meteo-v2/api.php?action=pressure"
 Projet réalisé par **Jean-Philippe Parein** avec beaucoup de matériel récupéré, quelques soudures et une quantité raisonnable de « tant qu'à faire… ».
 
 - Prévisions et géocodage : [Open-Meteo](https://open-meteo.com/)
+- Qualité de l'air : [Open-Meteo Air Quality API](https://open-meteo.com/en/docs/air-quality-api)
 - Pilote du capteur : [Adafruit CircuitPython DHT](https://github.com/adafruit/Adafruit_CircuitPython_DHT)
 - Plateforme : [Raspberry Pi](https://www.raspberrypi.com/)
 

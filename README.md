@@ -7,20 +7,10 @@ Version avec installateur interactif. Pour l'installation manuelle, voir la bran
 | Composant | Description |
 |-----------|-------------|
 | Raspberry Pi 2/3/4/5/Zero 2 | Le serveur |
-| Capteur DHT22 | Température + humidité |
+| Capteur DHT11 ou DHT22 | Température + humidité |
 | BMP280 (optionnel) | Baromètre I2C |
 | Carte microSD | Stockage (8 Go min) |
 | Alimentation USB-C | Pour le RPi |
-
-## Câblage DHT22
-
-```
-DHT22          Raspberry Pi
-──────         ───────────
-VCC (1)   →    Pin 1 (3.3V)
-DATA (2)  →    Pin 7 (GPIO 4)
-GND (3)   →    Pin 6 (GND)
-```
 
 ## Installation
 
@@ -30,7 +20,11 @@ cd station-meteo
 bash install.sh
 ```
 
-L'installateur détecte automatiquement le capteur, installe les dépendances, configure Apache et le service systemd.
+L'installateur :
+1. Détecte automatiquement le capteur (DHT11, DHT22, BMP280)
+2. Installe les dépendances (Apache, Python, venv)
+3. Configure le service systemd
+4. Démarre la station
 
 ## Désinstallation
 

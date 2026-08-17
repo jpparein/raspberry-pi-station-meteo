@@ -168,7 +168,7 @@ Ici, il est installé sous un avant-toit. La fixation fait appel à une technolo
 
 ![Installation extérieure du capteur](docs/images/11-installation-capteur-exterieur.png)
 
-Le Raspberry Pi reste à l'intérieur, près du routeur, avec les deux capteurs raccordés.
+Le Raspberry Pi reste à l'intérieur, près du routeur, posé sur une brique — un support sans ventilateur, sans vis et garanti totalement compatible avec le Raspberry Pi 2B. Le port Ethernet était disponible, mais la clé Wi-Fi était déjà configurée, l'adresse réservée dans la box et ma motivation pour refaire le réseau proche de zéro. Pour quelques requêtes météo, cette vieille clé suffit largement.
 
 ![Montage final avec DHT22 et BMP280](docs/images/MontageFinal.jpg)
 

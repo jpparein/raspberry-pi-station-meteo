@@ -233,6 +233,7 @@ L'installateur automatise tout. Plus besoin de taper vingt commandes à la main 
 ```bash
 sudo apt update
 sudo apt install -y git
+cd ~
 git clone -b main https://github.com/jpparein/raspberry-pi-station-meteo.git station-meteo
 cd station-meteo
 bash install.sh

@@ -1,10 +1,11 @@
 # Station météo Raspberry Pi : opération vide-tiroirs !
 
-![Raspberry Pi](https://img.shields.io/badge/Raspberry%20Pi-2B/C51A4A?logo=raspberrypi&logoColor=white)
+![Raspberry Pi](https://img.shields.io/badge/Raspberry%20Pi-2/3/4/5/C51A4A?logo=raspberrypi&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3-3776AB?logo=python&logoColor=white)
 ![PHP](https://img.shields.io/badge/PHP-Apache-777BB4?logo=php&logoColor=white)
 ![SQLite](https://img.shields.io/badge/Base-SQLite-003B57?logo=sqlite&logoColor=white)
-![Capteur](https://img.shields.io/badge/Capteur-DHT22-43A047)
+![Capteur](https://img.shields.io/badge/Capteur-DHT11/DHT22-43A047)
+![Baromètre](https://img.shields.io/badge/Baromètre-BMP280-optional-blue)
 ![Statut](https://img.shields.io/badge/Statut-Fonctionnel-brightgreen)
 
 Tout est parti d'un constat très scientifique : chez moi, j'avais un **Raspberry Pi 2B**, une vieille **clé Wi-Fi**, un **iPad Air sous iOS 12.5.7**, un ancien câble téléphonique RJ11 et quelques composants qui dormaient tranquillement dans mes tiroirs.
@@ -21,8 +22,8 @@ Le résultat n'a évidemment pas vocation à concurrencer Météo-France, mais i
 
 ## Ce qu'elle sait faire
 
-- mesure locale de la température et de l'humidité avec un DHT11 ou DHT22 ;
-- baromètre BMP280 en option (pression atmosphérique) ;
+- mesure locale de la température et de l'humidité avec un **DHT11** ou **DHT22** ;
+- **baromètre BMP280** en option (pression atmosphérique) ;
 - collecte automatique environ toutes les 5 minutes ;
 - stockage des mesures dans une base SQLite ;
 - mesure instantanée à la demande, sans l'enregistrer dans l'historique ;
@@ -39,17 +40,23 @@ Le résultat n'a évidemment pas vocation à concurrencer Météo-France, mais i
 
 > Les mesures et l'historique restent à la maison, sur le Raspberry Pi. Seules les prévisions et les heures de lever/coucher du soleil nécessitent Internet via Open-Meteo.
 
-## Matériel utilisé
+## Matériel compatible
 
-| Élément | Utilisation |
+| Composant | Compatibilité |
 |---|---|
-| Raspberry Pi 2 Model B | Serveur, acquisition et stockage |
-| Carte microSD 32 Go | Système et base SQLite |
-| DHT22 / AM2302 sur module | Température et humidité |
-| Ancien câble téléphonique RJ11 d'environ 5 m | Déport du capteur avec 3 de ses 4 fils |
-| Vieille clé Wi-Fi USB TP-Link | Connexion réseau : pas rapide, mais largement suffisante |
-| Boîtier transparent | Protection du Raspberry Pi |
-| Ancien iPad Air, iOS 12.5.7 | Écran tactile de la station |
+| Raspberry Pi 2 Model B | Oui |
+| Raspberry Pi 3 / 3B+ | Oui |
+| Raspberry Pi 4 Model B | Oui |
+| Raspberry Pi 5 | Oui |
+| Raspberry Pi Zero / Zero 2 | Oui |
+| Raspberry Pi 1 | Non supporté |
+
+| Composant | Rôle |
+|---|---|
+| DHT11 ou DHT22 sur module | Température et humidité |
+| BMP280 (optionnel) | Baromètre I2C |
+| Carte microSD (8 Go min) | Système et base SQLite |
+| Alimentation USB-C ou micro-USB | Pour le Raspberry Pi |
 
 ![Prototype Raspberry Pi et DHT22](docs/images/01-prototype-raspberry-dht22.jpg)
 
@@ -57,23 +64,26 @@ Le résultat n'a évidemment pas vocation à concurrencer Météo-France, mais i
 
 ```mermaid
 flowchart TD
-    A["Capteur DHT22"] --> B["collect.py"]
+    A["Capteur DHT11/DHT22"] --> B["collect.py"]
+    F["Capteur BMP280 (optionnel)"] --> B
     B --> C["Base SQLite"]
     C --> D["API PHP"]
     E["Open-Meteo"] --> D
-    D --> F["Interface web"]
-    F --> G["PC, mobile ou ancien iPad"]
+    D --> G["Interface web"]
+    G --> H["PC, mobile ou ancien iPad"]
 ```
 
-Le principe reste assez simple : le service `meteo-v2.service` garde `collect.py` éveillé pendant que nous dormons. Le script lit le capteur sur le GPIO 4, puis ajoute une mesure à SQLite environ toutes les cinq minutes. Apache et PHP transforment ensuite ces données en JSON pour l'interface web.
+Le service `meteo-v2.service` garde `collect.py` éveillé. Le script lit le capteur sur le GPIO, puis ajoute une mesure à SQLite environ toutes les cinq minutes. Apache et PHP transforment ensuite ces données en JSON pour l'interface web.
+
+Si un BMP280 est connecté, la pression atmosphérique est enregistrée en même temps que la température et l'humidité.
 
 Le bouton **Mesurer** utilise `live_read.py`. Il permet de satisfaire immédiatement le classique « oui, mais combien fait-il maintenant ? ». Cette lecture actualise l'écran sans être enregistrée : les statistiques restent basées uniquement sur les mesures automatiques.
 
-## Branchement du DHT22 — trois fils, pas un de plus
+## Câblage
 
-Le module utilisé possède trois broches : `+`, `OUT` et `−`.
+### DHT11 ou DHT22 — trois fils, pas un de plus
 
-| DHT22 | Raspberry Pi | Broche physique | Rôle |
+| Capteur | Raspberry Pi | Broche physique | Rôle |
 |---|---|---|---|
 | `+` / VCC | 3,3 V | 1 | Alimentation |
 | `OUT` / DATA | GPIO 4 | 7 | Données |
@@ -81,7 +91,18 @@ Le module utilisé possède trois broches : `+`, `OUT` et `−`.
 
 ![Brochage du capteur DHT22](docs/images/02-capteur-dht22-brochage.jpg)
 
-Le module DHT22 visible sur les photos intègre déjà son électronique de support. Vérifiez néanmoins le marquage de votre propre module : l'ordre des broches peut varier selon le fabricant.
+> Ajouter une résistance pull-up de 4.7kΩ entre DATA et VCC si le module ne l'a pas intégrée. Vérifiez le marquage de votre module : l'ordre des broches peut varier selon le fabricant.
+
+### BMP280 (optionnel) — quatre fils
+
+| BMP280 | Raspberry Pi | Broche physique | Rôle |
+|---|---|---|---|
+| VCC | 3,3 V | 1 | Alimentation |
+| GND | GND | 6 | Masse |
+| SCL | GPIO 3 (SCL) | 5 | Horloge I2C |
+| SDA | GPIO 2 (SDA) | 3 | Données I2C |
+
+> Le BMP280 nécessite l'activation du bus I2C. L'installateur s'en charge automatiquement.
 
 ### Préparation du câble récupéré
 
@@ -116,7 +137,7 @@ Ici, il est installé sous un avant-toit. La fixation fait appel à une technolo
 
 ![Installation extérieure du capteur](docs/images/11-installation-capteur-exterieur.png)
 
-Le Raspberry Pi reste à l'intérieur, près du routeur, posé sur une brique — un support sans ventilateur, sans vis et garanti totalement compatible avec le Raspberry Pi 2B.
+Le Raspberry Pi reste à l'intérieur, près du routeur, posé sur une brique — un support sans ventilateur, sans vis et garanti totalement compatible avec le Raspberry Pi.
 
 ![Raspberry Pi et clé Wi-Fi près du routeur](docs/images/10-installation-raspberry-et-wifi.png)
 
@@ -133,8 +154,9 @@ bash install.sh
 L'installateur va :
 1. Détecter automatiquement le capteur (DHT11, DHT22, BMP280) ;
 2. Installer les dépendances (Apache, Python, venv) ;
-3. Configurer le service systemd ;
-4. Démarrer la station.
+3. Activer I2C si un BMP280 est détecté ;
+4. Configurer le service systemd ;
+5. Démarrer la station.
 
 ## Donner une seconde vie à l'ancien iPad
 
@@ -159,6 +181,9 @@ sudo systemctl restart meteo-v2
 
 # Lecture instantanée du capteur
 python3 scripts/live_read.py
+
+# Vérifier la base de données
+sqlite3 data/meteo.db "SELECT * FROM mesures ORDER BY id DESC LIMIT 5;"
 ```
 
 ## Désinstallation
@@ -191,6 +216,18 @@ sudo journalctl -u meteo-v2 -n 50
 sudo systemctl status apache2
 sudo apache2ctl configtest
 ```
+
+### Le BMP280 n'est pas détecté
+
+```bash
+# Vérifier que I2C est activé
+ls /dev/i2c-*
+
+# Scanner le bus
+i2cdetect -y 1
+```
+
+Le BMP280 doit apparaître à l'adresse `0x76` ou `0x77`.
 
 ### Les prévisions sont absentes ou incorrectes
 

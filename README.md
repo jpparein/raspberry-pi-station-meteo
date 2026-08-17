@@ -10,9 +10,9 @@
 
 Tout est parti d'un constat très scientifique : chez moi, j'avais un **Raspberry Pi 2B**, une vieille **clé Wi-Fi**, un **iPad Air sous iOS 12.5.7**, un ancien câble téléphonique RJ11 et quelques composants qui dormaient tranquillement dans mes tiroirs.
 
-Le Raspberry Pi possède bien une prise Ethernet, mais le prototype avait déjà été configuré en Wi-Fi, avec son adresse réservée dans la box, et je n'avais franchement pas envie de tout refaire. En plus, une ancienne clé Wi-Fi TP-Link attendait justement son heure de gloire dans un tiroir. Elle est vieille, limitée au Wi-Fi 802.11n et ne gagnera aucun concours de vitesse, mais pour envoyer quelques mesures et servir une page web locale, elle est très largement suffisante. Autant qu'elle serve à quelque chose !
-
 Plutôt que de les laisser poursuivre leur carrière de ramasse-poussière, j'ai décidé d'en faire une station météo locale. Elle mesure la température, l'humidité et la pression, conserve un historique, affiche les prévisions, la qualité de l'air, les pollens, les informations solaires et transforme un ancien écran (iPad, tablette Android, etc.) en écran permanent.
+
+Le Raspberry Pi possède bien une prise Ethernet, mais le prototype avait déjà été configuré en Wi-Fi, avec son adresse réservée dans la box, et je n'avais franchement pas envie de tout refaire. En plus, une ancienne clé Wi-Fi TP-Link attendait justement son heure de gloire dans un tiroir. Elle est vieille, limitée au Wi-Fi 802.11n et ne gagnera aucun concours de vitesse, mais pour envoyer quelques mesures et servir une page web locale, elle est très largement suffisante. Autant qu'elle serve à quelque chose !
 
 Le résultat n'a évidemment pas vocation à concurrencer Météo-France, mais il est plutôt complet pour un projet fabriqué essentiellement avec ce que j'avais déjà sous la main.
 

@@ -114,7 +114,7 @@ Le bouton **Mesurer** utilise `live_read.py`. Il permet de satisfaire immédiate
 | `OUT` / DATA | GPIO 4 | 7 | Données |
 | `−` / GND | GND | 6 | Masse |
 
-![Brochage du capteur DHT22](docs/images/02-capteur-dht22-brochage.jpg)
+![Brochage du capteur DHT22](docs/images/capteur%20dht22.png)
 
 > Ajouter une résistance pull-up de 4.7kΩ entre DATA et VCC si le module ne l'a pas intégrée. Dans mon cas (module DHT22 avec PCB bleu), elle est déjà présente. Vérifiez le marquage de votre module : l'ordre des broches peut varier selon le fabricant.
 

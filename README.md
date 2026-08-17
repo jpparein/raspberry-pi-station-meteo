@@ -85,8 +85,6 @@ Le résultat n'a évidemment pas vocation à concurrencer Météo-France, mais i
 | Carte microSD (8 Go min) | Système et base SQLite |
 | Alimentation USB-C ou micro-USB | Pour le Raspberry Pi |
 
-![Prototype Raspberry Pi et DHT22](docs/images/01-prototype-raspberry-dht22.jpg)
-
 ## Principe de fonctionnement
 
 ```mermaid

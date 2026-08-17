@@ -231,7 +231,9 @@ Le Raspberry Pi reste à l'intérieur, près du routeur, posé sur une brique �
 L'installateur automatise tout. Plus besoin de taper vingt commandes à la main :
 
 ```bash
-git clone -b v2 https://github.com/jpparein/raspberry-pi-station-meteo.git station-meteo
+sudo apt update
+sudo apt install -y git
+git clone -b main https://github.com/jpparein/raspberry-pi-station-meteo.git station-meteo
 cd station-meteo
 bash install.sh
 ```

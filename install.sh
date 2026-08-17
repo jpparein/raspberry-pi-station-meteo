@@ -5,7 +5,7 @@
 # ============================================================================
 set -euo pipefail
 
-VERSION="1.0.0"
+VERSION="2.0.0"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CONF_FILE=""
 SERVICE_NAME="meteo-v2"
